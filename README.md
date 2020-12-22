@@ -1,0 +1,1 @@
+This is a project to demonstrate Act implementation to interact with Hand.
