@@ -1,2 +1,1 @@
 rootProject.name = 'th2-act-gui-demo'
-include "th2-grpc-gui-demo"
