@@ -21,12 +21,10 @@ import com.exactpro.th2.act.framework.TestUIFramework;
 import com.exactpro.th2.act.framework.exceptions.UIFrameworkException;
 import com.exactpro.th2.act.grpc.ExecutionReportParams;
 import com.exactpro.th2.act.grpc.HandWinActGrpc;
-import com.exactpro.th2.act.grpc.TestRhBatchResponse;
-import com.exactpro.th2.act.grpc.hand.RhBatchResponse;
+import com.exactpro.th2.act.grpc.RhBatchResponseDemo;
 import com.exactpro.th2.act.grpc.hand.RhSessionID;
 import com.exactpro.th2.act.grpc.hand.RhTargetServer;
 import com.exactpro.th2.check1.grpc.Check1Service;
-import com.exactpro.th2.common.schema.factory.CommonFactory;
 import com.google.protobuf.Empty;
 import io.grpc.stub.StreamObserver;
 import org.slf4j.Logger;
@@ -78,7 +76,7 @@ public class HandWinAct extends HandWinActGrpc.HandWinActImplBase
 	}
 
 	@Override
-	public void sendExecutionReport(ExecutionReportParams request, StreamObserver<TestRhBatchResponse> responseObserver)
+	public void sendExecutionReport(ExecutionReportParams request, StreamObserver<RhBatchResponseDemo> responseObserver)
 	{
 		new SendExecutionReport(framework, verifierConnector, responseObserver).run(request);
 	}

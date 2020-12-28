@@ -21,7 +21,7 @@ import com.exactpro.th2.act.framework.UIFramework;
 import com.exactpro.th2.act.framework.UIFrameworkContext;
 import com.exactpro.th2.act.framework.exceptions.UIFrameworkException;
 import com.exactpro.th2.act.grpc.ExecutionReportParams;
-import com.exactpro.th2.act.grpc.TestRhBatchResponse;
+import com.exactpro.th2.act.grpc.RhBatchResponseDemo;
 import com.exactpro.th2.act.grpc.hand.RhAction;
 import com.exactpro.th2.act.grpc.hand.RhBatchResponse;
 import com.exactpro.th2.act.grpc.hand.RhSessionID;
@@ -48,11 +48,11 @@ public class SendExecutionReport extends ActAction<ExecutionReportParams>
 	public static final String URL = "http://10.44.17.215:9001/index.html";
 	private static final Logger logger = LoggerFactory.getLogger(SendExecutionReport.class);
 
-	private final StreamObserver<TestRhBatchResponse> responseObserver;
+	private final StreamObserver<RhBatchResponseDemo> responseObserver;
 	private final Check1Service verifierConnector;
 	private Checkpoint checkpoint;
 
-	public SendExecutionReport(UIFramework framework, Check1Service verifierConnector, StreamObserver<TestRhBatchResponse> responseObserver)
+	public SendExecutionReport(UIFramework framework, Check1Service verifierConnector, StreamObserver<RhBatchResponseDemo> responseObserver)
 	{
 		super(framework);
 		this.responseObserver = responseObserver;
@@ -269,13 +269,14 @@ public class SendExecutionReport extends ActAction<ExecutionReportParams>
 	@Override
 	protected void processResult(ActResult actResult) throws UIFrameworkException
 	{
-		RhBatchResponse rhBatchResponse = RhBatchResponse.newBuilder()
+		RhBatchResponse.Builder rhBatchResponseBuilder = RhBatchResponse.newBuilder()
 				.setScriptStatus(convertStatus(actResult.getScriptStatus()))
-				.setSessionId(actResult.getSessionID().toString())
-//				.setErrorMessage(actResult.getErrorInfo())
-				.build();
+				.setSessionId(actResult.getSessionID().toString());
+		if (actResult.getErrorInfo() != null)
+			rhBatchResponseBuilder.setErrorMessage(actResult.getErrorInfo());
+		RhBatchResponse rhBatchResponse = rhBatchResponseBuilder.build();
 
-		TestRhBatchResponse response = TestRhBatchResponse.newBuilder()
+		RhBatchResponseDemo response = RhBatchResponseDemo.newBuilder()
 				.setBatchResponse(rhBatchResponse)
 				.setCheckpoint(checkpoint)
 				.build();
