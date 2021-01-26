@@ -82,19 +82,14 @@ apply plugin: 'application'
 apply plugin: 'com.palantir.docker'
 
 dependencies {
-    api platform('com.exactpro.th2:bom:2.9.+')
-    implementation "com.exactpro.th2:common"
-    implementation "com.exactpro.th2:grpc-common"
+    api platform('com.exactpro.th2:bom:2.10.1')
+
+    implementation 'com.exactpro.th2:common:2.9.0'
+    implementation 'com.exactpro.th2:grpc-common:2.3.2'
     implementation "com.exactpro.th2:grpc-act-gui-demo:2.1.0"
-    implementation "com.exactpro.th2:grpc-check1"
+    implementation 'com.exactpro.th2:grpc-check1:2.2.1'
     implementation "com.exactpro.th2:grpc-hand:2.2.0"
     implementation "com.exactpro.th2:act-gui-core:1.9.1"
-
-    implementation "com.google.protobuf:protobuf-java-util"
-    implementation "io.grpc:grpc-protobuf"
-    implementation "io.grpc:grpc-stub"
-    implementation "io.grpc:grpc-core"
-    implementation "io.grpc:grpc-netty"
 
     implementation "com.fasterxml.jackson.core:jackson-core"
     implementation "com.fasterxml.jackson.core:jackson-databind"
