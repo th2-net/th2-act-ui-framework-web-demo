@@ -45,7 +45,7 @@ import static com.google.protobuf.TextFormat.shortDebugString;
 
 public class SendExecutionReport extends ActAction<ExecutionReportParams>
 {
-	public static final String URL = "http://10.44.17.215:9001/index.html";
+	public static final String URL = "http://10.44.17.215:9000/";
 	private static final Logger logger = LoggerFactory.getLogger(SendExecutionReport.class);
 
 	private final StreamObserver<RhBatchResponseDemo> responseObserver;
