@@ -190,13 +190,13 @@ public class SendExecutionReport extends ActAction<ExecutionReportParams>
 		Map<String, Integer> result = new LinkedHashMap<>();
 		result.put("BeginString", 2);
 		result.put("BodyLength", 1);
-		result.put("SenderCompID", 2);
+		result.put("MsgSeqNum", 2);
+		result.put("SenderCompID", 1);
 		result.put("TargetCompID", 1);
-		result.put("MsgSeqNum", 1);
-		result.put("ExecID", 2);
+		result.put("ExecID", 3);
 		result.put("ClOrdID", 1);
 		result.put("OrderID", 1);
-		result.put("LeavesQty", 3);
+		result.put("LeavesQty", 1);
 		result.put("CumQty", 1);
 		result.put("SecurityID", 1);
 		result.put("PartyID", 5);
