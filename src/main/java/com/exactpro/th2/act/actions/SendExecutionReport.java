@@ -126,11 +126,15 @@ public class SendExecutionReport extends TestUIAction<ExecutionReportParams>
 		// #action,#wait,#locator,#matcher,
 		// Click,5,cssSelector,div.button:nth-child(2)
 		builderManager.click().locator(WebLocator.byCssSelector("div.button:nth-child(2")).wait(5).build();
-		builderManager.getElementInnerHtml().locator(WebLocator.byCssSelector("div.result-table")).wait(5).build();
+		WebLocator resultTable = WebLocator.byCssSelector("div.result-table");
+		builderManager.getElementInnerHtml().locator(resultTable).wait(5).build();
 
 		// #action,#seconds
 		// Wait,10
 		builderManager.waitAction().seconds(10).build();
+		
+		builderManager.getElementScreenshot().locator(resultTable).build();
+		builderManager.getScreenshot().build();
 		
 	}
 
