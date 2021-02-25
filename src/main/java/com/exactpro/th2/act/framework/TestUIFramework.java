@@ -18,11 +18,22 @@ package com.exactpro.th2.act.framework;
 
 import com.exactpro.th2.act.ActConnections;
 import com.exactpro.th2.act.configuration.CustomConfiguration;
+import com.exactpro.th2.act.grpc.hand.RhSessionID;
 
-public class TestUIFramework extends UIFramework
+public class TestUIFramework extends UIFramework<TestUIFrameworkContext, TestUIFrameworkSessionContext>
 {
 	public TestUIFramework(ActConnections<? extends CustomConfiguration> connections)
 	{
 		super(connections);
+	}
+
+	@Override
+	protected TestUIFrameworkContext createContext(RhSessionID rhSessionID, HandExecutor handExecutor) {
+		return new TestUIFrameworkContext(rhSessionID, handExecutor);
+	}
+
+	@Override
+	protected TestUIFrameworkSessionContext createSessionContext(TestUIFrameworkContext testUIFrameworkContext) {
+		return new TestUIFrameworkSessionContext(testUIFrameworkContext);
 	}
 }
