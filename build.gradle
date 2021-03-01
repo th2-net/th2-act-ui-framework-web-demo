@@ -86,7 +86,7 @@ dependencies {
     implementation "com.exactpro.th2:common:3.0.0"
     implementation "com.exactpro.th2:grpc-common:3.0.0"
     implementation "com.exactpro.th2:grpc-act-gui-demo:2.1.5"
-    implementation "com.exactpro.th2:grpc-check1"
+    implementation "com.exactpro.th2:grpc-check1:2.2.1"
     implementation "com.exactpro.th2:grpc-hand:2.5.4"
     implementation "com.exactpro.th2:act-gui-core:1.12.4-TH2-1455-598676231"
 
