@@ -129,7 +129,7 @@ public class SendExecutionReport extends TestUIAction<ExecutionReportParams>
 		builderManager.sendKeys().locator(inputAreaLocator).wait(5).needClick(true)
 				.text(fillFields(executionReportParams)).build();
 
-		builderManager.getElementScreenshot().locator(inputAreaLocator).build();
+		builderManager.getElementScreenshot().locator(WebLocator.byCssSelector("div.overflow-guard")).build();
 		
 		// clicking send and extracting table
 		builderManager.click().locator(WebLocator.byCssSelector("div.button:nth-child(2")).wait(5).build();
