@@ -17,6 +17,8 @@
 package com.exactpro.th2.act.actions;
 
 import com.exactpro.th2.act.ActResult;
+import com.exactpro.th2.act.TestUIActConfiguration;
+import com.exactpro.th2.act.configuration.CustomConfiguration;
 import com.exactpro.th2.act.framework.TestUIFramework;
 import com.exactpro.th2.act.framework.TestUIFrameworkContext;
 import com.exactpro.th2.act.framework.builders.web.WebBuilderManager;
@@ -45,7 +47,6 @@ import static com.google.protobuf.TextFormat.shortDebugString;
 
 public class SendExecutionReport extends TestUIAction<ExecutionReportParams>
 {
-	public static final String URL = "http://10.44.17.215:9000/";
 	private static final Logger logger = LoggerFactory.getLogger(SendExecutionReport.class);
 
 	private final StreamObserver<RhBatchResponseDemo> responseObserver;
@@ -98,44 +99,46 @@ public class SendExecutionReport extends TestUIAction<ExecutionReportParams>
 	{
 
 		WebBuilderManager builderManager = uiFrameworkContext.createBuilderManager();
-		
-		// Opening http://10.44.17.215:9001/index.html
-		builderManager.open().url(URL).build();
+
+		CustomConfiguration configuration = this.framework.getConfiguration();
+		String url ;
+		if (!(configuration instanceof TestUIActConfiguration) || 
+				StringUtils.isEmpty(url = ((TestUIActConfiguration) configuration).getUrl())) {
+			throw new UIFrameworkException("Invalid configuration. Act UI url should be provided");
+		}
+
+		// Opening ACT-URL
+		builderManager.open().url(url).build();
 		
 		// Waiting 3 sec
 		builderManager.waitAction().seconds(3).build();
 		
-		// #action,#wait,#locator,#matcher,#text
-		// SendKeys,5,cssSelector,#session,%Session%
+		// Choosing session from dropbox
 		builderManager.sendKeys().locator(WebLocator.byCssSelector("#session")).wait(5).needClick(true)
 				.text(executionReportParams.getSession()).build();
 		
-		// #action,#wait,#locator,#matcher,#text
-		// SendKeys,5,cssSelector,#msg-type,ExecutionReport
+		// Choosing msg type from dropbox
 		builderManager.sendKeys().locator(WebLocator.byCssSelector("#msg-type")).wait(5).needClick(true)
 				.text(executionReportParams.getMessageType() + SendTextExtraButtons.ENTER.handCommand()).build();
 
 		// Waiting 3 sec
 		builderManager.waitAction().seconds(3).build();
 
-		// #action,#wait,#locator,#matcher,#text
-		// SendKeys,5,cssSelector,.inputarea,"#down##end##backspace#%ExecID%,"
-		builderManager.sendKeys().locator(WebLocator.byCssSelector(".inputarea")).wait(5).needClick(true)
+		// Adding fields from script to message
+		WebLocator inputAreaLocator = WebLocator.byCssSelector(".inputarea");
+		builderManager.sendKeys().locator(inputAreaLocator).wait(5).needClick(true)
 				.text(fillFields(executionReportParams)).build();
+
+		builderManager.getElementScreenshot().locator(inputAreaLocator).build();
 		
-		// #action,#wait,#locator,#matcher,
-		// Click,5,cssSelector,div.button:nth-child(2)
+		// clicking send and extracting table
 		builderManager.click().locator(WebLocator.byCssSelector("div.button:nth-child(2")).wait(5).build();
 		WebLocator resultTable = WebLocator.byCssSelector("div.result-table");
 		builderManager.getElementInnerHtml().locator(resultTable).wait(5).build();
 
-		// #action,#seconds
-		// Wait,10
+		// Waiting 10 seconds
 		builderManager.waitAction().seconds(10).build();
-		
-		builderManager.getElementScreenshot().locator(resultTable).build();
 		builderManager.getScreenshot().build();
-		
 	}
 
 	private String fillFields(ExecutionReportParams params)
