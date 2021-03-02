@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,18 @@
 package com.exactpro.th2.act;
 
 import com.exactpro.th2.act.configuration.CustomConfiguration;
-import com.exactpro.th2.common.schema.factory.CommonFactory;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class TestUIActConnections extends ActConnections<CustomConfiguration>
-{
-	public TestUIActConnections(CommonFactory commonFactory) throws Exception
-	{
-		super(commonFactory);
+public class TestUIActConfiguration extends CustomConfiguration {
+
+	@JsonProperty("act_url")
+	private String url;
+
+	public String getUrl() {
+		return url;
 	}
 
-	@Override
-	protected TestUIActConfiguration createCustomConfiguration(CommonFactory commonFactory)
-	{
-		return commonFactory.getCustomConfiguration(TestUIActConfiguration.class);
+	public void setUrl(String url) {
+		this.url = url;
 	}
 }

@@ -1,94 +1,60 @@
 plugins {
-//    id 'com.google.protobuf' version '0.8.8' apply false
     id 'com.palantir.docker' version '0.25.0' apply false
-//    id "de.undercouch.download" version "4.0.4" apply false
     id "com.jfrog.artifactory" version '4.15.1'
-}
-
-allprojects {
-    apply plugin: 'java'
-    apply plugin: 'java-library'
-    apply plugin: 'com.jfrog.artifactory'
-
-    ext {
-        sharedDir           = file("${project.rootDir}/shared")
-    }
-
-    group = 'com.exactpro.th2'
-    version = release_version
-
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-
-    jar {
-        manifest {
-            attributes(
-                    'Created-By':               "${System.getProperty('java.version')} (${System.getProperty('java.vendor')})",
-                    'Specification-Title':      '',
-                    'Specification-Vendor':     'Exactpro Systems LLC',
-                    'Implementation-Title':     project.archivesBaseName,
-                    'Implementation-Vendor':    'Exactpro Systems LLC',
-                    'Implementation-Vendor-Id': 'com.exactpro',
-                    'Implementation-Version':   project.version
-            )
-        }
-    }
-
-    repositories {
-        maven {
-            name 'MavenLocal'
-            url sharedDir
-        }
-        mavenCentral()
-        maven {
-            name 'Artifactory snapshot'
-            url 'http://artifactory5.exp.exactpro.com/artifactory/libs-snapshot'
-        }
-        maven {
-            name 'Bintray'
-            url 'https://dl.bintray.com/exactpro/th2'
-        }
-        maven {
-            name 'Artifactory release'
-            url 'http://artifactory5.exp.exactpro.com/artifactory/libs-release'
-        }
-        mavenLocal()
-
-        configurations.all {
-            resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-            resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'
-        }
-    }
-
-    artifactoryPublish.skip = true
-
-    artifactory {
-        publish {
-            defaults {
-                // Reference to Gradle publications defined in the build script.
-                // This is how we tell the Artifactory Plugin which artifacts should be
-                // published to Artifactory.
-                publications('mavenJava')
-                publishArtifacts = true
-                publishBuildInfo = true
-                // Properties to be attached to the published artifacts.
-                publishPom = true
-            }
-        }
-    }
 }
 
 apply plugin: 'application'
 apply plugin: 'com.palantir.docker'
+apply plugin: 'java'
+apply plugin: 'java-library'
+apply plugin: 'com.jfrog.artifactory'
+
+ext {
+    sharedDir           = file("${project.rootDir}/shared")
+}
+
+group = 'com.exactpro.th2'
+version = release_version
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+repositories {
+    maven {
+        name 'MavenLocal'
+        url sharedDir
+    }
+    mavenCentral()
+    maven {
+        name 'Artifactory snapshot'
+        url 'http://artifactory5.exp.exactpro.com/artifactory/libs-snapshot'
+    }
+    maven {
+        name 'Bintray'
+        url 'https://dl.bintray.com/exactpro/th2'
+    }
+    maven {
+        name 'Artifactory release'
+        url 'http://artifactory5.exp.exactpro.com/artifactory/libs-release'
+    }
+    mavenLocal()
+
+    configurations.all {
+        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+        resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'
+    }
+}
+
+artifactoryPublish.skip = true
 
 dependencies {
     api platform('com.exactpro.th2:bom:2.10.1')
     implementation "com.exactpro.th2:common:3.0.0"
     implementation "com.exactpro.th2:grpc-common:3.0.0"
     implementation "com.exactpro.th2:grpc-act-gui-demo:2.1.5"
-    implementation "com.exactpro.th2:grpc-check1:2.2.1"
-    implementation "com.exactpro.th2:grpc-hand:2.5.4"
-    implementation "com.exactpro.th2:act-gui-core:1.12.4-TH2-1455-598676231"
+    implementation "com.exactpro.th2:grpc-check1:3.0.0"
+    implementation "com.exactpro.th2:grpc-hand:2.6.2"
+    implementation "com.exactpro.th2:act-gui-core:2.0.1"
 
     implementation "com.fasterxml.jackson.core:jackson-core"
     implementation "com.fasterxml.jackson.core:jackson-databind"
@@ -111,6 +77,35 @@ distTar {
 
 dockerPrepare {
     dependsOn distTar
+}
+
+jar {
+    manifest {
+        attributes(
+                'Created-By':               "${System.getProperty('java.version')} (${System.getProperty('java.vendor')})",
+                'Specification-Title':      '',
+                'Specification-Vendor':     'Exactpro Systems LLC',
+                'Implementation-Title':     project.archivesBaseName,
+                'Implementation-Vendor':    'Exactpro Systems LLC',
+                'Implementation-Vendor-Id': 'com.exactpro',
+                'Implementation-Version':   project.version
+        )
+    }
+}
+
+artifactory {
+    publish {
+        defaults {
+            // Reference to Gradle publications defined in the build script.
+            // This is how we tell the Artifactory Plugin which artifacts should be
+            // published to Artifactory.
+            publications('mavenJava')
+            publishArtifacts = true
+            publishBuildInfo = true
+            // Properties to be attached to the published artifacts.
+            publishPom = true
+        }
+    }
 }
 
 docker {

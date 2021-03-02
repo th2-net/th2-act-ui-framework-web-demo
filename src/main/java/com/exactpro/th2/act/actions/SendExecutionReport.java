@@ -17,15 +17,18 @@
 package com.exactpro.th2.act.actions;
 
 import com.exactpro.th2.act.ActResult;
-import com.exactpro.th2.act.framework.UIFramework;
-import com.exactpro.th2.act.framework.UIFrameworkContext;
+import com.exactpro.th2.act.TestUIActConfiguration;
+import com.exactpro.th2.act.configuration.CustomConfiguration;
+import com.exactpro.th2.act.framework.TestUIFramework;
+import com.exactpro.th2.act.framework.TestUIFrameworkContext;
+import com.exactpro.th2.act.framework.builders.web.WebBuilderManager;
+import com.exactpro.th2.act.framework.builders.web.WebLocator;
 import com.exactpro.th2.act.framework.exceptions.UIFrameworkException;
+import com.exactpro.th2.act.framework.ui.constants.SendTextExtraButtons;
 import com.exactpro.th2.act.grpc.ExecutionReportParams;
 import com.exactpro.th2.act.grpc.RhBatchResponseDemo;
-import com.exactpro.th2.act.grpc.hand.RhAction;
 import com.exactpro.th2.act.grpc.hand.RhBatchResponse;
 import com.exactpro.th2.act.grpc.hand.RhSessionID;
-import com.exactpro.th2.act.grpc.hand.rhactions.RhActionsMessages;
 import com.exactpro.th2.check1.grpc.Check1Service;
 import com.exactpro.th2.check1.grpc.CheckpointRequest;
 import com.exactpro.th2.check1.grpc.CheckpointResponse;
@@ -40,19 +43,17 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.exactpro.th2.act.grpc.hand.rhactions.RhActionsMessages.Locator.CSS_SELECTOR;
 import static com.google.protobuf.TextFormat.shortDebugString;
 
-public class SendExecutionReport extends ActAction<ExecutionReportParams>
+public class SendExecutionReport extends TestUIAction<ExecutionReportParams>
 {
-	public static final String URL = "http://10.44.17.215:9000/";
 	private static final Logger logger = LoggerFactory.getLogger(SendExecutionReport.class);
 
 	private final StreamObserver<RhBatchResponseDemo> responseObserver;
 	private final Check1Service verifierConnector;
 	private Checkpoint checkpoint;
 
-	public SendExecutionReport(UIFramework framework, Check1Service verifierConnector, StreamObserver<RhBatchResponseDemo> responseObserver)
+	public SendExecutionReport(TestUIFramework framework, Check1Service verifierConnector, StreamObserver<RhBatchResponseDemo> responseObserver)
 	{
 		super(framework);
 		this.responseObserver = responseObserver;
@@ -93,81 +94,51 @@ public class SendExecutionReport extends ActAction<ExecutionReportParams>
 	}
 
 	@Override
-	protected void collectActions(ExecutionReportParams executionReportParams, UIFrameworkContext uiFrameworkContext,
+	protected void collectActions(ExecutionReportParams executionReportParams, TestUIFrameworkContext uiFrameworkContext,
 			ActResult actResult) throws UIFrameworkException
 	{
-		// #action,#url
-		// Open,http://10.44.17.215:9001/index.html
-		RhActionsMessages.Open openMsg = RhActionsMessages.Open.newBuilder().setUrl(URL).build();
-		uiFrameworkContext.addRhAction(RhAction.newBuilder().setOpen(openMsg).build());
 
-		// #action,#seconds
-		// Wait,3
-		RhActionsMessages.Wait wait3Msg = RhActionsMessages.Wait.newBuilder().setSeconds(3).build();
-		RhAction wait3Action = RhAction.newBuilder().setWait(wait3Msg).build();
-		uiFrameworkContext.addRhAction(wait3Action);
+		WebBuilderManager builderManager = uiFrameworkContext.createBuilderManager();
 
-		// #action,#wait,#locator,#matcher,#text
-		// SendKeys,5,cssSelector,#session,%Session%
-		RhActionsMessages.SendKeys skMsg = RhActionsMessages.SendKeys.newBuilder()
-				.setLocator(CSS_SELECTOR)
-				.setNeedClick(true)
-				.setWait(5)
-				.setMatcher("#session")
-				.setText(executionReportParams.getSession())
-				.build();
-		uiFrameworkContext.addRhAction(RhAction.newBuilder().setSendKeys(skMsg).build());
+		CustomConfiguration configuration = this.framework.getConfiguration();
+		String url ;
+		if (!(configuration instanceof TestUIActConfiguration) || 
+				StringUtils.isEmpty(url = ((TestUIActConfiguration) configuration).getUrl())) {
+			throw new UIFrameworkException("Invalid configuration. Act UI url should be provided");
+		}
 
+		// Opening ACT-URL
+		builderManager.open().url(url).build();
 		
-		// #action,#wait,#locator,#matcher,#text
-		// SendKeys,5,cssSelector,#msg-type,ExecutionReport
-		skMsg = RhActionsMessages.SendKeys.newBuilder()
-				.setLocator(CSS_SELECTOR)
-				.setNeedClick(true)
-				.setWait(5)
-				.setMatcher("#msg-type")
-				.setText(executionReportParams.getMessageType()+"#Enter")
-				.build();
-		uiFrameworkContext.addRhAction(RhAction.newBuilder().setSendKeys(skMsg).build());
-
-		// #action,#seconds
-		// Wait,3
-		uiFrameworkContext.addRhAction(wait3Action);
-
-		// #action,#wait,#locator,#matcher,#text
-		// SendKeys,5,cssSelector,.inputarea,"#down##end##backspace#%ExecID%,"
-		skMsg = RhActionsMessages.SendKeys.newBuilder()
-				.setLocator(CSS_SELECTOR)
-				.setNeedClick(true)
-				.setWait(5)
-				.setMatcher(".inputarea")
-				.setText(fillFields(executionReportParams))
-				.build();
-		uiFrameworkContext.addRhAction(RhAction.newBuilder().setSendKeys(skMsg).build());
+		// Waiting 3 sec
+		builderManager.waitAction().seconds(3).build();
 		
-		// #action,#wait,#locator,#matcher,
-		// Click,5,cssSelector,div.button:nth-child(2)
-		RhActionsMessages.Click clickMsg = RhActionsMessages.Click.newBuilder()
-				.setLocator(CSS_SELECTOR)
-				.setWait(5)
-				.setMatcher("div.button:nth-child(2")
-				.build();
-		uiFrameworkContext.addRhAction(RhAction.newBuilder().setClick(clickMsg).build());
-
+		// Choosing session from dropbox
+		builderManager.sendKeys().locator(WebLocator.byCssSelector("#session")).wait(5).needClick(true)
+				.text(executionReportParams.getSession()).build();
 		
-		RhActionsMessages.GetElementInnerHtml getElementMsg = RhActionsMessages.GetElementInnerHtml.newBuilder()
-				.setLocator(CSS_SELECTOR)
-				.setWait(5)
-				.setMatcher("div.result-table")
-				.build();
-		uiFrameworkContext.addRhAction(RhAction.newBuilder().setGetElementInnerHtml(getElementMsg).build());
+		// Choosing msg type from dropbox
+		builderManager.sendKeys().locator(WebLocator.byCssSelector("#msg-type")).wait(5).needClick(true)
+				.text(executionReportParams.getMessageType() + SendTextExtraButtons.ENTER.handCommand()).build();
 
-		// #action,#seconds
-		// Wait,10
-		RhActionsMessages.Wait wait10Msg = RhActionsMessages.Wait.newBuilder().setSeconds(10).build();
-		RhAction wait10Action = RhAction.newBuilder().setWait(wait10Msg).build();
-		uiFrameworkContext.addRhAction(wait10Action);
+		// Waiting 3 sec
+		builderManager.waitAction().seconds(3).build();
+
+		// Adding fields from script to message
+		WebLocator inputAreaLocator = WebLocator.byCssSelector(".inputarea");
+		builderManager.sendKeys().locator(inputAreaLocator).wait(5).needClick(true)
+				.text(fillFields(executionReportParams)).build();
+
+		builderManager.getElementScreenshot().locator(WebLocator.byCssSelector("div.overflow-guard")).build();
 		
+		// clicking send and extracting table
+		builderManager.click().locator(WebLocator.byCssSelector("div.button:nth-child(2")).wait(5).build();
+		WebLocator resultTable = WebLocator.byCssSelector("div.result-table");
+		builderManager.getElementInnerHtml().locator(resultTable).wait(5).build();
+
+		// Waiting 10 seconds
+		builderManager.waitAction().seconds(10).build();
+		builderManager.getScreenshot().build();
 	}
 
 	private String fillFields(ExecutionReportParams params)
@@ -178,8 +149,10 @@ public class SendExecutionReport extends ActAction<ExecutionReportParams>
 		{
 			String fieldValue = fields.getOrDefault(entry.getKey(), "");
 			Integer relativePosition = entry.getValue();
-			sb.append(StringUtils.repeat("#down#", relativePosition)).append("#end##left#")
-					.append(fieldValue.isEmpty() ? fieldValue : StringUtils.wrap(fieldValue,'"')).append("#right#");
+			sb.append(StringUtils.repeat(SendTextExtraButtons.DOWN.handCommand(), relativePosition))
+					.append(SendTextExtraButtons.END.handCommand()).append(SendTextExtraButtons.LEFT.handCommand())
+					.append(fieldValue.isEmpty() ? fieldValue : StringUtils.wrap(fieldValue,'"'))
+					.append(SendTextExtraButtons.RIGHT.handCommand());
 		}
 
 		return sb.toString();
@@ -214,7 +187,7 @@ public class SendExecutionReport extends ActAction<ExecutionReportParams>
 		RhSessionID sessionID = getSessionID(details);
 
 		ActResult actResult = new ActResult();
-		UIFrameworkContext frameworkContext = null;
+		TestUIFrameworkContext frameworkContext = null;
 		try {
 			frameworkContext = framework.newExecution(sessionID);
 			EventID currentEventId = getParentEventId(details);
@@ -224,8 +197,6 @@ public class SendExecutionReport extends ActAction<ExecutionReportParams>
 			}
 			frameworkContext.setParentEventId(currentEventId);
 			
-//			this.collectActions(details, frameworkContext, actResult);
-//			this.submitActions(details, frameworkContext, actResult);
 			checkpoint = registerCheckPoint(currentEventId);
 			this.collectActions(details, frameworkContext, actResult);
 			this.submitActions(details, frameworkContext, actResult);
