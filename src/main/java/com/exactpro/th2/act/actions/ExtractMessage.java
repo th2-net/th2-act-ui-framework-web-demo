@@ -55,7 +55,7 @@ public class ExtractMessage extends TestUIAction<RptViewerDetails>{
 
 	@Override
 	protected String getName() {
-		return "ExtractSentMessage";
+		return "Extract sent message from GUI";
 	}
 
 	@Override
@@ -98,6 +98,7 @@ public class ExtractMessage extends TestUIAction<RptViewerDetails>{
 		
 		//clicks on show raw
 		builderManager.click().locator(WebLocator.byXPath(MESSAGE_HEADER_XPATH)).wait(30).build();
+		builderManager.waitAction().seconds(1).build();
 		builderManager.click().locator(WebLocator.byXPath(MESSAGE_SHOW_RAW_XPATH)).wait(5).build();
 		//clicks on copy all to clipboard
 		builderManager.click().locator(WebLocator.byXPath(MESSAGE_COPY_ALL_XPATH)).wait(5).build();

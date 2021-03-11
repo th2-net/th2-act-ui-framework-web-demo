@@ -47,6 +47,7 @@ public class HandWinAct extends HandWinActGrpc.HandWinActImplBase
 	@Override
 	public void register(RhTargetServer request, StreamObserver<RhSessionID> responseObserver)
 	{
+		logger.debug("Executing register");
 		RhSessionID result = framework.getHandExecutor().register(request);
 		
 		try {
@@ -58,12 +59,14 @@ public class HandWinAct extends HandWinActGrpc.HandWinActImplBase
 		}
 		
 		responseObserver.onCompleted();
+		logger.debug("Execution finished");
 	}
 	
 
 	@Override
 	public void unregister(RhSessionID request, StreamObserver<Empty> responseObserver)
 	{
+		logger.debug("Executing unregister");
 		framework.getHandExecutor().unregister(request);
 		
 		try {
@@ -75,16 +78,21 @@ public class HandWinAct extends HandWinActGrpc.HandWinActImplBase
 		}
 		
 		responseObserver.onCompleted();
+		logger.debug("Execution finished");
 	}
 
 
 	@Override
 	public void sendNewOrderSingle(NewOrderSingleParams request, StreamObserver<RhBatchResponseDemo> responseObserver) {
+		logger.debug("Executing sendNewOrderSingle");
 		new SendNewOrderSingle(framework, verifierConnector, responseObserver).run(request);
+		logger.debug("Execution finished");
 	}
 
 	@Override
 	public void extractSentMessage(RptViewerDetails request, StreamObserver<RhBatchResponseDemo> responseObserver) {
+		logger.debug("Executing extractSentMessage");
 		new ExtractMessage(framework, responseObserver).run(request);
+		logger.debug("Execution finished");
 	}
 }

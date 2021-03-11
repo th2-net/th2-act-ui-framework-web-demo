@@ -71,22 +71,20 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams>
 	}
 
 	@Override
-	protected String getName()
-	{
-		String[] split = StringUtils.splitByCharacterTypeCamelCase(getClass().getSimpleName());
-		return StringUtils.join(split, " ");
-	}
-
+	protected String getName() {
+		return "Send New Order Single via GUI";
+	}	
 	
-	
-	@Override
-	protected Map<String, String> convertRequestParams(NewOrderSingleParams executionReportParams)
-	{
+	private Map<String, String> getServiceParamsMap(NewOrderSingleParams executionReportParams) {
 		Map<String, String> params = new LinkedHashMap<>();
 		params.put("session", executionReportParams.getSession());
 		params.put("dictionary", executionReportParams.getDictionary());
 		params.put("messageType", executionReportParams.getMessageType());
-		
+		return params;
+	}
+
+	private Map<String, String> getMgsBodyParamsMap(NewOrderSingleParams executionReportParams) {
+		Map<String, String> params = new LinkedHashMap<>();
 		var body = executionReportParams.getMessage();
 		body.getAllFields().entrySet().stream()
 				.filter(ent -> ent.getKey().getJavaType() != JavaType.MESSAGE)
@@ -99,7 +97,14 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams>
 			var key = "NoPartyId[" + i + "]_";
 			noPartyID.getAllFields().forEach((key1, value) -> params.put(key + key1.getName(), String.valueOf(value)));
 		}
-
+		return params;
+	}
+	
+	@Override
+	protected Map<String, String> convertRequestParams(NewOrderSingleParams executionReportParams)
+	{
+		Map<String, String> params = new LinkedHashMap<>(this.getServiceParamsMap(executionReportParams));
+		params.putAll(getMgsBodyParamsMap(executionReportParams));
 		return params;
 	}
 
@@ -139,25 +144,34 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams>
 
 		// Waiting 3 sec
 		builderManager.waitAction().seconds(3).build();
-
-		// Choosing session from dropbox
-		builderManager.sendKeys().locator(WebLocator.byCssSelector("#session")).wait(5).needClick(true)
-				.text(nosParams.getSession() + SendTextExtraButtons.ENTER.handCommand()).build();
-
-		builderManager.waitAction().seconds(1).build();
 		
-		// Choosing session from dropbox
-		builderManager.sendKeys().locator(WebLocator.byCssSelector("#dictionary")).wait(5).needClick(true)
-				.text(nosParams.getDictionary() + SendTextExtraButtons.ENTER.handCommand()).build();
+		if (!nosParams.getSession().isEmpty()) {
+			// Choosing session from dropbox
+			builderManager.sendKeys().locator(WebLocator.byCssSelector("#session")).wait(5).needClick(true)
+					.text(nosParams.getSession() + SendTextExtraButtons.ENTER.handCommand()).build();
+
+			builderManager.waitAction().seconds(1).build();
+		}
+
+		if (!nosParams.getDictionary().isEmpty()) {
+			// Choosing session from dropbox
+			builderManager.sendKeys().locator(WebLocator.byCssSelector("#dictionary")).wait(5).needClick(true)
+					.text(nosParams.getDictionary() + SendTextExtraButtons.ENTER.handCommand()).build();
+
+			builderManager.waitAction().seconds(1).build();
+		}
 		
-		builderManager.waitAction().seconds(1).build();
+		if (!nosParams.getMessageType().isEmpty()) {
+			// Choosing msg type from dropbox
+			builderManager.sendKeys().locator(WebLocator.byCssSelector("#msg-type")).wait(5).needClick(true)
+					.text(nosParams.getMessageType() + SendTextExtraButtons.ENTER.handCommand()).build();
 
-		// Choosing msg type from dropbox
-		builderManager.sendKeys().locator(WebLocator.byCssSelector("#msg-type")).wait(5).needClick(true)
-				.text(nosParams.getMessageType() + SendTextExtraButtons.ENTER.handCommand()).build();
-
-		// Waiting 3 sec
-		builderManager.waitAction().seconds(3).build();
+			// Waiting 3 sec
+			builderManager.waitAction().seconds(3).build();
+		}
+		
+		uiFrameworkContext.submit("Filling service parameters", getServiceParamsMap(nosParams));
+		
 
 		// Adding fields from script to message
 		WebLocator inputAreaLocator = WebLocator.byCssSelector(".inputarea");
@@ -176,13 +190,15 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams>
 
 		// Waiting 3 sec
 		builderManager.waitAction().seconds(3).build();
+
+		uiFrameworkContext.submit("Filling message body and sending message", getMgsBodyParamsMap(nosParams));
 		
 		builderManager.getElementAttribute().locator(WebLocator.byXPath("//*[@class='result ok']/pre/a"))
 				.attribute("href").wait(20).build();
 		
 		builderManager.getScreenshot().build();
 
-		RhBatchResponse sending_nos = uiFrameworkContext.submit("Sending NOS");
+		RhBatchResponse sending_nos = uiFrameworkContext.submit("Checking sending result");
 
 		ResultDetails resultDetails = sending_nos.getResultList().get(0);
 		String urlRpt = resultDetails.getResult();
@@ -245,7 +261,7 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams>
 	@Override
 	public void run(NewOrderSingleParams details)
 	{
-
+		logger.debug("Executing SendNewOrderSingle");
 		RhSessionID sessionID = getSessionID(details);
 
 		ActResult actResult = new ActResult();
@@ -258,12 +274,15 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams>
 				currentEventId = framework.createParentEvent(currentEventId, getName(), requestParams);
 			}
 			frameworkContext.setParentEventId(currentEventId);
-			
+
+			logger.debug("Creating checkpoint");
 			checkpoint = registerCheckPoint(currentEventId);
+			logger.debug("Executing UI steps");
 			this.collectActions(details, frameworkContext, actResult);
 			this.submitActions(details, frameworkContext, actResult);
 			actResult.setSessionID(sessionID);
 
+			logger.debug("Execution finished");
 		} catch (UIFrameworkException e) {
 			logger.error("Cannot execute", e);
 			actResult.setScriptStatus(ActResult.ActExecutionStatus.ACT_ERROR);
