@@ -59,14 +59,12 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams>
 {
 	private static final Logger logger = LoggerFactory.getLogger(SendNewOrderSingle.class);
 
-	private final StreamObserver<RhBatchResponseDemo> responseObserver;
 	private final Check1Service verifierConnector;
 	private Checkpoint checkpoint;
 
 	public SendNewOrderSingle(TestUIFramework framework, Check1Service verifierConnector, StreamObserver<RhBatchResponseDemo> responseObserver)
 	{
-		super(framework);
-		this.responseObserver = responseObserver;
+		super(framework, responseObserver);
 		this.verifierConnector = verifierConnector;
 	}
 
@@ -300,46 +298,9 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams>
 		}
 	}
 
-	protected static RhBatchResponseDemo.ExecutionStatus convertStatus(ActResult.ActExecutionStatus actStatus)
-	{
-		switch (actStatus)
-		{
-			case SUCCESS:
-				return RhBatchResponseDemo.ExecutionStatus.SUCCESS;
-			case COMPILE_ERROR:
-				return RhBatchResponseDemo.ExecutionStatus.COMPILE_ERROR;
-			case EXECUTION_ERROR:
-				return RhBatchResponseDemo.ExecutionStatus.EXECUTION_ERROR;
-			case HAND_ERROR:
-				return RhBatchResponseDemo.ExecutionStatus.HAND_ERROR;
-			case ACT_ERROR:
-			default:
-				return RhBatchResponseDemo.ExecutionStatus.ACT_ERROR;
-		}
-	}
-
 	@Override
-	protected void processResult(ActResult actResult) throws UIFrameworkException
-	{
-		var response = RhBatchResponseDemo.newBuilder();
-		if (actResult.getData() != null) {
-			response.putAllData(actResult.getData());
-		}
-		if (actResult.getStatusInfo() != null) {
-			response.setStatusInfo(actResult.getStatusInfo());
-		}
-		if (actResult.getErrorInfo() != null) {
-			response.setErrorInfo(actResult.getErrorInfo());
-		}
-		if (actResult.getScriptStatus() != null) {
-			response.setScriptStatus(SendNewOrderSingle.convertStatus(actResult.getScriptStatus()));
-		} else {
-			response.setScriptStatus(RhBatchResponseDemo.ExecutionStatus.SUCCESS);
-		}
-		response.setCheckpoint(checkpoint);
-
-		responseObserver.onNext(response.build());
-		responseObserver.onCompleted();
+	protected Checkpoint getCheckpoint() {
+		return checkpoint;
 	}
 
 	private Checkpoint registerCheckPoint(EventID parentEventId) {
