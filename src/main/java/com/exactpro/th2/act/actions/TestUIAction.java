@@ -28,6 +28,7 @@ import io.grpc.stub.StreamObserver;
 public abstract class TestUIAction<T> extends ActAction<T, TestUIFrameworkContext, TestUIFrameworkSessionContext> {
 
 	protected final StreamObserver<RhBatchResponseDemo> responseObserver;
+	protected String description;
 	
 	public TestUIAction(TestUIFramework framework, StreamObserver<RhBatchResponseDemo> responseObserver) {
 		super(framework);
@@ -38,6 +39,16 @@ public abstract class TestUIAction<T> extends ActAction<T, TestUIFrameworkContex
 		return null;
 	}
 	
+	protected String getDescription(T input) {
+		return null;
+	}
+
+	@Override
+	public void run(T details) {
+		this.description = this.getDescription(details);
+		super.run(details);
+	}
+
 	@Override
 	protected void processResult(ActResult actResult) throws UIFrameworkException
 	{

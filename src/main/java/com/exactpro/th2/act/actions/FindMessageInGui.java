@@ -59,7 +59,16 @@ public class FindMessageInGui extends TestUIAction<RptViewerSearchDetails> {
 
 	@Override
 	protected String getName() {
-		return "Search Message In GUI";
+		String str = "Search Message In GUI";
+		if (description != null && !description.isEmpty()) {
+			str += " - " + description;
+		}
+		return str;
+	}
+
+	@Override
+	protected String getDescription(RptViewerSearchDetails input) {
+		return input.getDescription();
 	}
 
 	@Override

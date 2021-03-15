@@ -51,7 +51,16 @@ public class ExtractMessage extends TestUIAction<RptViewerDetails>{
 
 	@Override
 	protected String getName() {
-		return "Extract sent message from GUI";
+		String str = "Extract sent message from GUI";
+		if (description != null && !description.isEmpty()) {
+			str += " - " + description;
+		}
+		return str;
+	}
+
+	@Override
+	protected String getDescription(RptViewerDetails input) {
+		return input.getDescription();
 	}
 
 	@Override

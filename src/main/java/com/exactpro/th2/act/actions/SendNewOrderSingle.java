@@ -70,9 +70,18 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams>
 
 	@Override
 	protected String getName() {
-		return "Send New Order Single via GUI";
-	}	
-	
+		String str = "Send New Order Single via GUI";
+		if (description != null && !description.isEmpty()) {
+			str += " - " + description;
+		}
+		return str;
+	}
+
+	@Override
+	protected String getDescription(NewOrderSingleParams input) {
+		return input.getDescription();
+	}
+
 	private Map<String, String> getServiceParamsMap(NewOrderSingleParams executionReportParams) {
 		Map<String, String> params = new LinkedHashMap<>();
 		params.put("session", executionReportParams.getSession());
@@ -261,6 +270,7 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams>
 	{
 		logger.debug("Executing SendNewOrderSingle");
 		RhSessionID sessionID = getSessionID(details);
+		this.description = getDescription(details);
 
 		ActResult actResult = new ActResult();
 		TestUIFrameworkContext frameworkContext = null;
