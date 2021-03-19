@@ -51,7 +51,7 @@ dependencies {
     api platform('com.exactpro.th2:bom:2.10.1')
     implementation "com.exactpro.th2:common:3.0.0"
     implementation "com.exactpro.th2:grpc-common:3.0.0"
-    implementation "com.exactpro.th2:grpc-act-gui-demo:2.1.8-th2_1610-653877622"
+    implementation "com.exactpro.th2:grpc-act-gui-demo:3.0.0"
     implementation "com.exactpro.th2:grpc-check1:3.0.0"
     implementation "com.exactpro.th2:grpc-hand:2.6.3"
     implementation "com.exactpro.th2:act-gui-core:2.0.3"
