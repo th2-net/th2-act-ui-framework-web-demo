@@ -16,12 +16,16 @@
 
 package com.exactpro.th2.act;
 
-import com.exactpro.th2.act.actions.SendExecutionReport;
+import com.exactpro.th2.act.actions.ExtractMessage;
+import com.exactpro.th2.act.actions.FindMessageInGui;
+import com.exactpro.th2.act.actions.SendNewOrderSingle;
 import com.exactpro.th2.act.framework.TestUIFramework;
 import com.exactpro.th2.act.framework.exceptions.UIFrameworkException;
-import com.exactpro.th2.act.grpc.ExecutionReportParams;
 import com.exactpro.th2.act.grpc.HandWinActGrpc;
+import com.exactpro.th2.act.grpc.NewOrderSingleParams;
 import com.exactpro.th2.act.grpc.RhBatchResponseDemo;
+import com.exactpro.th2.act.grpc.RptViewerDetails;
+import com.exactpro.th2.act.grpc.RptViewerSearchDetails;
 import com.exactpro.th2.act.grpc.hand.RhSessionID;
 import com.exactpro.th2.act.grpc.hand.RhTargetServer;
 import com.exactpro.th2.check1.grpc.Check1Service;
@@ -45,6 +49,7 @@ public class HandWinAct extends HandWinActGrpc.HandWinActImplBase
 	@Override
 	public void register(RhTargetServer request, StreamObserver<RhSessionID> responseObserver)
 	{
+		logger.debug("Executing register");
 		RhSessionID result = framework.getHandExecutor().register(request);
 		
 		try {
@@ -56,12 +61,14 @@ public class HandWinAct extends HandWinActGrpc.HandWinActImplBase
 		}
 		
 		responseObserver.onCompleted();
+		logger.debug("Execution finished");
 	}
 	
 
 	@Override
 	public void unregister(RhSessionID request, StreamObserver<Empty> responseObserver)
 	{
+		logger.debug("Executing unregister");
 		framework.getHandExecutor().unregister(request);
 		
 		try {
@@ -73,11 +80,28 @@ public class HandWinAct extends HandWinActGrpc.HandWinActImplBase
 		}
 		
 		responseObserver.onCompleted();
+		logger.debug("Execution finished");
 	}
 
 	@Override
-	public void sendExecutionReport(ExecutionReportParams request, StreamObserver<RhBatchResponseDemo> responseObserver)
-	{
-		new SendExecutionReport(framework, verifierConnector, responseObserver).run(request);
+	public void sendNewOrderSingleGui(NewOrderSingleParams request, StreamObserver<RhBatchResponseDemo> responseObserver) {
+		logger.debug("Executing sendNewOrderSingleGui");
+		new SendNewOrderSingle(framework, verifierConnector, responseObserver).run(request);
+		logger.debug("Execution finished");
 	}
+
+	@Override
+	public void extractSentMessageGui(RptViewerDetails request, StreamObserver<RhBatchResponseDemo> responseObserver) {
+		logger.debug("Executing extractSentMessageGui");
+		new ExtractMessage(framework, responseObserver).run(request);
+		logger.debug("Execution finished");
+	}
+
+	@Override
+	public void findMessageGui(RptViewerSearchDetails request, StreamObserver<RhBatchResponseDemo> responseObserver) {
+		logger.debug("Executing findMessageGui");
+		new FindMessageInGui(framework, responseObserver).run(request);
+		logger.debug("Execution finished");
+	}
+	
 }
