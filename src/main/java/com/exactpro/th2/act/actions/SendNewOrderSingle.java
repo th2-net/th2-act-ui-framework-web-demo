@@ -153,6 +153,10 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams>
 		builderManager.waitAction().seconds(3).build();
 		
 		if (!nosParams.getSession().isEmpty()) {
+			builderManager.waitForElement().seconds(10)
+					.locator(WebLocator.byXPath(String.format("//select[@id='session']/option[text()='%s']",
+							nosParams.getSession()))).build();
+			
 			// Choosing session from dropbox
 			builderManager.sendKeys().locator(WebLocator.byCssSelector("#session")).wait(5).needClick(true)
 					.text(nosParams.getSession() + SendTextExtraButtons.ENTER.handCommand()).build();
@@ -161,6 +165,9 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams>
 		}
 
 		if (!nosParams.getDictionary().isEmpty()) {
+			builderManager.waitForElement().seconds(10)
+					.locator(WebLocator.byXPath(String.format("//select[@id='dictionary']/option[text()='%s']",
+							nosParams.getDictionary()))).build();
 			// Choosing session from dropbox
 			builderManager.sendKeys().locator(WebLocator.byCssSelector("#dictionary")).wait(5).needClick(true)
 					.text(nosParams.getDictionary() + SendTextExtraButtons.ENTER.handCommand()).build();
@@ -169,6 +176,9 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams>
 		}
 		
 		if (!nosParams.getMessageType().isEmpty()) {
+			builderManager.waitForElement().seconds(10)
+					.locator(WebLocator.byXPath(String.format("//select[@id='msg-type']/option[text()='%s']",
+							nosParams.getMessageType()))).build();
 			// Choosing msg type from dropbox
 			builderManager.sendKeys().locator(WebLocator.byCssSelector("#msg-type")).wait(5).needClick(true)
 					.text(nosParams.getMessageType() + SendTextExtraButtons.ENTER.handCommand()).build();
