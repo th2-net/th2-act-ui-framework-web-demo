@@ -41,9 +41,10 @@ public class ExtractMessage extends TestUIAction<RptViewerDetails>{
 	private static final Logger logger = LoggerFactory.getLogger(ExtractMessage.class);
 	
 	public static final String EVENT_XPATH = "//*[@class='event-header-card__title' and starts-with(@title, 'Send')]";
-	public static final String MESSAGE_SHOW_RAW_XPATH = "//div[contains(@class, 'message-card') and contains(@class, 'selected')]//*[contains(@class, 'ascii')]";
-	public static final String MESSAGE_HEADER_XPATH = "//div[contains(@class, 'message-card') and contains(@class, 'selected')]//div[contains(@class, 'mc-header')]";
-	public static final String MESSAGE_COPY_ALL_XPATH = "//div[contains(@class, 'message-card') and contains(@class, 'selected')]//div[contains(@class, 'mc-raw__copy-all')]";
+	public static final String ATTACHED_MESSAGE_XPATH = "//div[contains(@class, 'attached') and contains(@class, 'message-card')]";
+	public static final String MESSAGE_SHOW_RAW_XPATH = "//div[contains(@class, 'attached') and contains(@class, 'message-card')]//div[@class='message-card-tools__ellipsis']";
+	public static final String MESSAGE_SHOW_ASCII_XPATH = "//div[contains(@class, 'attached') and contains(@class, 'message-card')]//div[@class='message-card-tools__icon ascii']";
+	public static final String MESSAGE_COPY_ALL_XPATH = "//div[contains(@class, 'attached') and contains(@class, 'message-card')]//div[@class='message-card-tools__copy-all']";
 	
 	public ExtractMessage(TestUIFramework framework, StreamObserver<RhBatchResponseDemo> responseObserver) {
 		super(framework, responseObserver);
@@ -103,11 +104,12 @@ public class ExtractMessage extends TestUIAction<RptViewerDetails>{
 		builderManager.click().locator(WebLocator.byXPath(EVENT_XPATH)).wait(5).build();
 		
 		//clicks on show raw
-//		builderManager.click().locator(WebLocator.byXPath(MESSAGE_HEADER_XPATH)).wait(30).build();
-//		builderManager.waitAction().seconds(1).build();
+
 		builderManager.executeJSElement().locator(WebLocator.byXPath(MESSAGE_SHOW_RAW_XPATH)).wait(30)
 				.command("@Element@.click()").build();
+		builderManager.click().locator(WebLocator.byXPath(MESSAGE_SHOW_ASCII_XPATH)).wait(5).build();
 		//clicks on copy all to clipboard
+		builderManager.click().locator(WebLocator.byXPath(ATTACHED_MESSAGE_XPATH)).wait(5).build();
 		builderManager.click().locator(WebLocator.byXPath(MESSAGE_COPY_ALL_XPATH)).wait(5).build();
 		
 		builderManager.waitAction().seconds(5).build();

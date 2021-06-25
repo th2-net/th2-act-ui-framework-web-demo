@@ -43,13 +43,14 @@ public class FindMessageInGui extends TestUIAction<RptViewerSearchDetails> {
 	private static final Logger logger = LoggerFactory.getLogger(FindMessageInGui.class);
 	
 	public static final String OPEN_FILTER_BTN = "//*[@class='messages-window-header']//*[contains(@class, 'filter__title')]";
-	public static final String ROW_MSG_TYPE = "(//*[@class='filter']//*[@class='filter__compound'])[2]//*[@class='filter-content']";
-	public static final String ROW_BODY_TYPE = "(//*[@class='filter']//*[@class='filter__compound'])[3]//*[@class='filter-content']";
+	public static final String ROW_MSG_TYPE = "(//div[contains(@style, 'visible')]/*[@class='filter']//*[@class='filter__compound'])[2]//input";
+	public static final String ROW_BODY_TYPE = "(//div[contains(@style, 'visible')]/*[@class='filter']//*[@class='filter__compound'])[3]//input";
 	public static final String BUTTON_APPLY_TYPE = "(//*[@class='filter-row__button'])[2]";
-	
-	public static final String MESSAGE_SHOW_RAW_XPATH = "(//div[contains(@class, 'message-card')])[1]//*[contains(@class, 'ascii')]";
-	public static final String MESSAGE_HEADER_XPATH = "(//div[contains(@class, 'message-card')])[1]//div[contains(@class, 'mc-header')]";
-	public static final String MESSAGE_COPY_ALL_XPATH = "(//div[contains(@class, 'message-card')])[1]//div[contains(@class, 'mc-raw__copy-all')]";
+
+	public static final String ATTACHED_MESSAGE_XPATH = "//div[contains(@class, 'message-card')]";
+	public static final String MESSAGE_SHOW_RAW_XPATH = "//div[contains(@class, 'message-card')]//div[@class='message-card-tools__ellipsis']";
+	public static final String MESSAGE_SHOW_ASCII_XPATH = "//div[contains(@class, 'message-card')]//div[@class='message-card-tools__icon ascii']";
+	public static final String MESSAGE_COPY_ALL_XPATH = "//div[contains(@class, 'message-card')]//div[@class='message-card-tools__copy-all']";
 
 
 	public FindMessageInGui(TestUIFramework framework, StreamObserver<RhBatchResponseDemo> responseObserver) {
@@ -123,11 +124,12 @@ public class FindMessageInGui extends TestUIAction<RptViewerSearchDetails> {
 		builderManager.click().locator(WebLocator.byXPath(BUTTON_APPLY_TYPE)).build();
 
 		//clicks on show raw
-//		builderManager.click().locator(WebLocator.byXPath(MESSAGE_HEADER_XPATH)).wait(30).build();
-//		builderManager.waitAction().seconds(1).build();
-		builderManager.executeJSElement().locator(WebLocator.byXPath(MESSAGE_SHOW_RAW_XPATH)).wait(20)
+
+		builderManager.executeJSElement().locator(WebLocator.byXPath(MESSAGE_SHOW_RAW_XPATH)).wait(30)
 				.command("@Element@.click()").build();
+		builderManager.click().locator(WebLocator.byXPath(MESSAGE_SHOW_ASCII_XPATH)).wait(5).build();
 		//clicks on copy all to clipboard
+		builderManager.click().locator(WebLocator.byXPath(ATTACHED_MESSAGE_XPATH)).wait(5).build();
 		builderManager.click().locator(WebLocator.byXPath(MESSAGE_COPY_ALL_XPATH)).wait(5).build();
 
 		builderManager.waitAction().seconds(5).build();

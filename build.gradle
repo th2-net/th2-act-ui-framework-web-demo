@@ -26,18 +26,6 @@ repositories {
     }
     mavenCentral()
     maven {
-        name 'Artifactory snapshot'
-        url 'http://artifactory5.exp.exactpro.com/artifactory/libs-snapshot'
-    }
-    maven {
-        name 'Bintray'
-        url 'https://dl.bintray.com/exactpro/th2'
-    }
-    maven {
-        name 'Artifactory release'
-        url 'http://artifactory5.exp.exactpro.com/artifactory/libs-release'
-    }
-    maven {
         name 'Sonatype_snapshots'
         url 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
     }
@@ -56,13 +44,13 @@ repositories {
 artifactoryPublish.skip = true
 
 dependencies {
-    api platform('com.exactpro.th2:bom:2.10.2')
-    implementation "com.exactpro.th2:common:3.13.1"
-    implementation "com.exactpro.th2:grpc-common:3.1.1"
-    implementation "com.exactpro.th2:grpc-act-gui-demo:3.0.1"
-    implementation "com.exactpro.th2:grpc-check1:3.1.1"
-    implementation "com.exactpro.th2:grpc-hand:2.6.4"
-    implementation "com.exactpro.th2:act-gui-core:2.0.6"
+    api platform('com.exactpro.th2:bom:3.0.0')
+    implementation "com.exactpro.th2:common:3.16.3"
+    implementation "com.exactpro.th2:grpc-common:3.1.2"
+    implementation "com.exactpro.th2:grpc-act-gui-demo:3.1.0"
+    implementation "com.exactpro.th2:grpc-check1:3.1.4"
+    implementation "com.exactpro.th2:grpc-hand:2.7.8"
+    implementation "com.exactpro.th2:act-gui-core:2.2.6"
 
     implementation "com.fasterxml.jackson.core:jackson-core"
     implementation "com.fasterxml.jackson.core:jackson-databind"
