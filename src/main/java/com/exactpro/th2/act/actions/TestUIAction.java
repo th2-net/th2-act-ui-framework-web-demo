@@ -86,7 +86,7 @@ public abstract class TestUIAction<T> extends ActAction<T, TestUIFrameworkContex
 				return RhBatchResponseDemo.ExecutionStatus.COMPILE_ERROR;
 			case EXECUTION_ERROR:
 				return RhBatchResponseDemo.ExecutionStatus.EXECUTION_ERROR;
-			case HAND_ERROR:
+			case HAND_INTERNAL_ERROR:
 				return RhBatchResponseDemo.ExecutionStatus.HAND_ERROR;
 			case ACT_ERROR:
 			default:
