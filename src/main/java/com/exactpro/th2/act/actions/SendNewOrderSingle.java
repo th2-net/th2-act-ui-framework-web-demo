@@ -203,7 +203,7 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams>
 		}
 
 		// clicking send and extracting table
-		builderManager.click().locator(WebLocator.byCssSelector("div.button:nth-child(2")).wait(5).build();
+		builderManager.click().locator(WebLocator.byXPath("//div[@class='app__buttons']/div[@role='button']")).wait(5).build();
 
 		// Waiting 3 sec
 		builderManager.waitAction().seconds(3).build();

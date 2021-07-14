@@ -1,4 +1,4 @@
-# th2 act UI-Framework (web) demo (3.3.0)
+# th2 act UI-Framework (web) demo (3.3.1)
 
 This is a project to demonstrate Act implementation to interact with Hand in web mode.
 This project contains actions which
@@ -23,6 +23,9 @@ spec:
 ```
 
 ## Release Notes
+
+### 3.3.1
++ fixed issues interacting with UI elements
 
 ### 3.3.0
 + renamed project to th2-act-ui-framework-web-demo
