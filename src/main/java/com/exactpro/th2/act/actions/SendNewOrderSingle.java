@@ -187,7 +187,7 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams>
 			builderManager.waitAction().seconds(3).build();
 		}
 		
-		uiFrameworkContext.submit("Filling service parameters", getServiceParamsMap(nosParams));
+		uiFrameworkContext.submit("Filling service parameters");
 		
 
 		// Adding fields from script to message
@@ -203,12 +203,12 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams>
 		}
 
 		// clicking send and extracting table
-		builderManager.click().locator(WebLocator.byCssSelector("div.button:nth-child(2")).wait(5).build();
+		builderManager.click().locator(WebLocator.byXPath("//div[@class='app__buttons']/div[@role='button']")).wait(5).build();
 
 		// Waiting 3 sec
 		builderManager.waitAction().seconds(3).build();
 
-		uiFrameworkContext.submit("Filling message body and sending message", getMgsBodyParamsMap(nosParams));
+		uiFrameworkContext.submit("Filling message body and sending message");
 		
 		builderManager.getElementAttribute().locator(WebLocator.byXPath("//*[@class='result ok']/pre/a"))
 				.attribute("href").wait(20).build();
@@ -297,7 +297,7 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams>
 			checkpoint = registerCheckPoint(currentEventId);
 			logger.debug("Executing UI steps");
 			this.collectActions(details, frameworkContext, actResult);
-			this.submitActions(details, frameworkContext, actResult);
+			this.submitActions(frameworkContext, actResult);
 			actResult.setSessionID(sessionID);
 
 			logger.debug("Execution finished");

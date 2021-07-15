@@ -41,6 +41,7 @@ public class ExtractMessage extends TestUIAction<RptViewerDetails>{
 	private static final Logger logger = LoggerFactory.getLogger(ExtractMessage.class);
 	
 	public static final String EVENT_XPATH = "//*[@class='event-header-card__title' and starts-with(@title, 'Send')]";
+	public static final String EVENT_EXPAND_XPATH = "//div[@class='event-tree-card' and @style='padding-left: 20px;']//div[contains(@class, 'selected')]/../div[contains(@class, 'expand-icon')]";
 	public static final String ATTACHED_MESSAGE_XPATH = "//div[contains(@class, 'attached') and contains(@class, 'message-card')]";
 	public static final String MESSAGE_SHOW_RAW_XPATH = "//div[contains(@class, 'attached') and contains(@class, 'message-card')]//div[@class='message-card-tools__ellipsis']";
 	public static final String MESSAGE_SHOW_ASCII_XPATH = "//div[contains(@class, 'attached') and contains(@class, 'message-card')]//div[@class='message-card-tools__icon ascii']";
@@ -99,7 +100,12 @@ public class ExtractMessage extends TestUIAction<RptViewerDetails>{
 
 		builderManager.open().url(rptViewerDetails.getUrl()).build();
 
+		
+
 		//waits that event is loaded
+		//expand subroot event
+		builderManager.click().locator(WebLocator.byXPath(EVENT_EXPAND_XPATH)).wait(5).build();
+		
 		//clicks on events to filter and highlight messages
 		builderManager.click().locator(WebLocator.byXPath(EVENT_XPATH)).wait(5).build();
 		
