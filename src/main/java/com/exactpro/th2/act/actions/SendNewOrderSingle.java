@@ -217,7 +217,7 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams>
 
 		RhBatchResponse sending_nos = uiFrameworkContext.submit("Checking sending result");
 		if (sending_nos.getResultList().isEmpty()) {
-			actResult.setErrorInfo("th2-hand didn't return any values (url to rpt-viewer expected");
+			actResult.setErrorInfo("th2-hand didn't return any values (expected URL to rpt-viewer)");
 			actResult.setScriptStatus(ActResult.ActExecutionStatus.EXECUTION_ERROR);
 			return;
 		}

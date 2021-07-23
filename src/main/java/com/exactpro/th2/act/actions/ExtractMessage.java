@@ -85,6 +85,17 @@ public class ExtractMessage extends TestUIAction<RptViewerDetails>{
 		return logger;
 	}
 
+	static void clickOnSendEvent(WebBuilderManager builderManager) throws UIFrameworkBuildingException {
+		//waits that event is loaded
+		//expand subroot event
+		builderManager.waitForElement().locator(WebLocator.byXPath(EVENT_EXPAND_XPATH)).seconds(5).build();
+		builderManager.waitAction().seconds(1).build();
+		builderManager.click().locator(WebLocator.byXPath(EVENT_EXPAND_XPATH)).build();
+		
+		//clicks on events to filter and highlight messages
+		builderManager.click().locator(WebLocator.byXPath(EVENT_XPATH)).wait(5).build();
+	}
+	
 	@Override
 	protected void collectActions(RptViewerDetails rptViewerDetails, TestUIFrameworkContext testUIFrameworkContext, ActResult actResult) throws UIFrameworkException {
 			
@@ -100,19 +111,9 @@ public class ExtractMessage extends TestUIAction<RptViewerDetails>{
 
 		builderManager.open().url(rptViewerDetails.getUrl()).build();
 
-		
-
-		//waits that event is loaded
-		//expand subroot event
-		builderManager.waitForElement().locator(WebLocator.byXPath(EVENT_EXPAND_XPATH)).seconds(5).build();
-		builderManager.waitAction().seconds(1).build();
-		builderManager.click().locator(WebLocator.byXPath(EVENT_EXPAND_XPATH)).build();
-		
-		//clicks on events to filter and highlight messages
-		builderManager.click().locator(WebLocator.byXPath(EVENT_XPATH)).wait(5).build();
+		clickOnSendEvent(builderManager);
 		
 		//clicks on show raw
-
 		builderManager.executeJSElement().locator(WebLocator.byXPath(MESSAGE_SHOW_RAW_XPATH)).wait(30)
 				.command("@Element@.click()").build();
 		builderManager.click().locator(WebLocator.byXPath(MESSAGE_SHOW_ASCII_XPATH)).wait(5).build();
