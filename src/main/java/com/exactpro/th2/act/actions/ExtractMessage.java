@@ -104,7 +104,9 @@ public class ExtractMessage extends TestUIAction<RptViewerDetails>{
 
 		//waits that event is loaded
 		//expand subroot event
-		builderManager.click().locator(WebLocator.byXPath(EVENT_EXPAND_XPATH)).wait(5).build();
+		builderManager.waitForElement().locator(WebLocator.byXPath(EVENT_EXPAND_XPATH)).wait(5).build();
+		builderManager.waitAction().seconds(1);
+		builderManager.click().locator(WebLocator.byXPath(EVENT_EXPAND_XPATH)).build();
 		
 		//clicks on events to filter and highlight messages
 		builderManager.click().locator(WebLocator.byXPath(EVENT_XPATH)).wait(5).build();

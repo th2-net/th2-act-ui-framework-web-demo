@@ -216,7 +216,11 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams>
 		builderManager.getScreenshot().build();
 
 		RhBatchResponse sending_nos = uiFrameworkContext.submit("Checking sending result");
-
+		if (sending_nos.getResultList().isEmpty()) {
+			actResult.setErrorInfo("th2-hand didn't return any values (url to rpt-viewer expected");
+			actResult.setScriptStatus(ActResult.ActExecutionStatus.EXECUTION_ERROR);
+			return;
+		}
 		ResultDetails resultDetails = sending_nos.getResultList().get(0);
 		String urlRpt = resultDetails.getResult();
 		if (StringUtils.isNotEmpty(resultDetails.getActionId())) {

@@ -38,6 +38,9 @@ import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static com.exactpro.th2.act.actions.ExtractMessage.*;
+import static com.exactpro.th2.act.actions.ExtractMessage.EVENT_EXPAND_XPATH;
+
 public class FindMessageInGui extends TestUIAction<RptViewerSearchDetails> {
 
 	private static final Logger logger = LoggerFactory.getLogger(FindMessageInGui.class);
@@ -111,10 +114,12 @@ public class FindMessageInGui extends TestUIAction<RptViewerSearchDetails> {
 
 		//waits that event is loaded
 		//expand subroot event
-		builderManager.click().locator(WebLocator.byXPath(ExtractMessage.EVENT_EXPAND_XPATH)).wait(5).build();
+		builderManager.waitForElement().locator(WebLocator.byXPath(EVENT_EXPAND_XPATH)).wait(5).build();
+		builderManager.waitAction().seconds(1);
+		builderManager.click().locator(WebLocator.byXPath(EVENT_EXPAND_XPATH)).build();
 
 		//clicks on events to filter and highlight messages
-		builderManager.click().locator(WebLocator.byXPath(ExtractMessage.EVENT_XPATH)).wait(5).build();
+		builderManager.click().locator(WebLocator.byXPath(EVENT_XPATH)).wait(5).build();
 
 		builderManager.waitAction().seconds(2).build();
 		//filtering
