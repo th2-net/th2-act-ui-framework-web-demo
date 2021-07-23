@@ -114,8 +114,8 @@ public class FindMessageInGui extends TestUIAction<RptViewerSearchDetails> {
 
 		//waits that event is loaded
 		//expand subroot event
-		builderManager.waitForElement().locator(WebLocator.byXPath(EVENT_EXPAND_XPATH)).wait(5).build();
-		builderManager.waitAction().seconds(1);
+		builderManager.waitForElement().locator(WebLocator.byXPath(EVENT_EXPAND_XPATH)).seconds(5).build();
+		builderManager.waitAction().seconds(1).build();
 		builderManager.click().locator(WebLocator.byXPath(EVENT_EXPAND_XPATH)).build();
 
 		//clicks on events to filter and highlight messages
