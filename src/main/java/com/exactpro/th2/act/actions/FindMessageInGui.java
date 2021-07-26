@@ -25,7 +25,6 @@ import com.exactpro.th2.act.framework.exceptions.UIFrameworkBuildingException;
 import com.exactpro.th2.act.framework.exceptions.UIFrameworkException;
 import com.exactpro.th2.act.framework.ui.constants.SendTextExtraButtons;
 import com.exactpro.th2.act.grpc.RhBatchResponseDemo;
-import com.exactpro.th2.act.grpc.RptViewerDetails;
 import com.exactpro.th2.act.grpc.RptViewerSearchDetails;
 import com.exactpro.th2.act.grpc.hand.RhSessionID;
 import com.exactpro.th2.common.grpc.EventID;
@@ -37,6 +36,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import static com.exactpro.th2.act.actions.ExtractMessage.*;
 
 public class FindMessageInGui extends TestUIAction<RptViewerSearchDetails> {
 
@@ -109,12 +110,7 @@ public class FindMessageInGui extends TestUIAction<RptViewerSearchDetails> {
 
 		builderManager.open().url(rptViewerDetails.getUrl()).build();
 
-		//waits that event is loaded
-		//expand subroot event
-		builderManager.click().locator(WebLocator.byXPath(ExtractMessage.EVENT_EXPAND_XPATH)).wait(5).build();
-
-		//clicks on events to filter and highlight messages
-		builderManager.click().locator(WebLocator.byXPath(ExtractMessage.EVENT_XPATH)).wait(5).build();
+		clickOnSendEvent(builderManager);
 
 		builderManager.waitAction().seconds(2).build();
 		//filtering

@@ -24,6 +24,10 @@ spec:
 
 ## Release Notes
 
+### 3.3.2
++ fixed issues interacting with UI elements
++ fixed error when th2-hand doesn't return expected url 
+
 ### 3.3.1
 + fixed issues interacting with UI elements
 
