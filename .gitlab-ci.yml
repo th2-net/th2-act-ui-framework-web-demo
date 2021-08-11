@@ -1,5 +1,5 @@
 variables:
-  APP_NAME: "th2-act-ui-framework-web-demo"
+  APP_NAME: "th2-act-uiframework-web-demo"
   MAJOR_VERSION: "3"
   MINOR_VERSION: "3"
   MAINTENANCE_VERSION: "0"

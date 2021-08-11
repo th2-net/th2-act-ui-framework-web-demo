@@ -19,7 +19,7 @@ package com.exactpro.th2.act.framework;
 import com.exactpro.th2.act.framework.builders.web.WebBuilderManager;
 import com.exactpro.th2.act.grpc.hand.RhSessionID;
 
-public class TestUIFrameworkContext extends UIFrameworkContext {
+public class TestUIFrameworkContext extends UIWebFrameworkContext {
 	
 	public TestUIFrameworkContext(RhSessionID sessionID, HandExecutor handExecutor) {
 		super(sessionID, handExecutor);

@@ -292,8 +292,7 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams>
 			frameworkContext = framework.newExecution(sessionID);
 			EventID currentEventId = getParentEventId(details);
 			if (storeParentEvent()) {
-				Map<String, String> requestParams = convertRequestParams(details);
-				currentEventId = framework.createParentEvent(currentEventId, getName(), requestParams);
+				currentEventId = framework.createEvent(currentEventId, getName(), createAdditionalEventInfo());
 			}
 			frameworkContext.setParentEventId(currentEventId);
 

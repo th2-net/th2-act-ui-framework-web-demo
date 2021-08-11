@@ -21,7 +21,7 @@ import com.exactpro.th2.act.actions.FindMessageInGui;
 import com.exactpro.th2.act.actions.SendNewOrderSingle;
 import com.exactpro.th2.act.framework.TestUIFramework;
 import com.exactpro.th2.act.framework.exceptions.UIFrameworkException;
-import com.exactpro.th2.act.grpc.HandWinActGrpc;
+import com.exactpro.th2.act.grpc.UiFrameWorkHandWebActGrpc;
 import com.exactpro.th2.act.grpc.NewOrderSingleParams;
 import com.exactpro.th2.act.grpc.RhBatchResponseDemo;
 import com.exactpro.th2.act.grpc.RptViewerDetails;
@@ -34,7 +34,7 @@ import io.grpc.stub.StreamObserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HandWinAct extends HandWinActGrpc.HandWinActImplBase
+public class HandWinAct extends UiFrameWorkHandWebActGrpc.UiFrameWorkHandWebActImplBase
 {
 	private static final Logger logger = LoggerFactory.getLogger(HandWinAct.class);
 	private final TestUIFramework framework; 
