@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2022 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,15 +55,13 @@ import java.util.Map;
 
 import static com.google.protobuf.TextFormat.shortDebugString;
 
-public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams>
-{
+public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams> {
 	private static final Logger logger = LoggerFactory.getLogger(SendNewOrderSingle.class);
 
 	private final Check1Service verifierConnector;
 	private Checkpoint checkpoint;
 
-	public SendNewOrderSingle(TestUIFramework framework, Check1Service verifierConnector, StreamObserver<RhBatchResponseDemo> responseObserver)
-	{
+	public SendNewOrderSingle(TestUIFramework framework, Check1Service verifierConnector, StreamObserver<RhBatchResponseDemo> responseObserver) {
 		super(framework, responseObserver);
 		this.verifierConnector = verifierConnector;
 	}
@@ -108,28 +106,24 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams>
 	}
 	
 	@Override
-	protected Map<String, String> convertRequestParams(NewOrderSingleParams executionReportParams)
-	{
+	protected Map<String, String> convertRequestParams(NewOrderSingleParams executionReportParams) {
 		Map<String, String> params = new LinkedHashMap<>(this.getServiceParamsMap(executionReportParams));
 		params.putAll(getMgsBodyParamsMap(executionReportParams));
 		return params;
 	}
 
 	@Override
-	protected RhSessionID getSessionID(NewOrderSingleParams executionReportParams)
-	{
+	protected RhSessionID getSessionID(NewOrderSingleParams executionReportParams) {
 		return executionReportParams.getSessionID();
 	}
 
 	@Override
-	protected EventID getParentEventId(NewOrderSingleParams executionReportParams)
-	{
+	protected EventID getParentEventId(NewOrderSingleParams executionReportParams) {
 		return executionReportParams.getEventID();
 	}
 
 	@Override
-	protected Logger getLogger()
-	{
+	protected Logger getLogger() {
 		return logger;
 	}
 
@@ -149,51 +143,45 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams>
 		// Opening ACT-URL
 		builderManager.open().url(url).build();
 
-		// Waiting 3 sec
-		builderManager.waitAction().seconds(3).build();
-		
-		if (!nosParams.getSession().isEmpty()) {
-			builderManager.waitForElement().seconds(10)
-					.locator(WebLocator.byXPath(String.format("//select[@id='session']/option[text()='%s']",
-							nosParams.getSession()))).build();
-			
-			// Choosing session from dropbox
-			builderManager.sendKeys().locator(WebLocator.byCssSelector("#session")).wait(5).needClick(true)
-					.text(nosParams.getSession() + SendTextExtraButtons.ENTER.handCommand()).build();
+		// Waiting 10 sec
+		builderManager.waitAction().seconds(10).build();
 
-			builderManager.waitAction().seconds(1).build();
+		if (!nosParams.getSession().isEmpty()) {
+			// Opening 'session' dropbox
+			builderManager.click().wait(1).locator(WebLocator.byId("session")).build();
+
+			// Choosing session from dropbox
+			builderManager.click().wait(10).locator(WebLocator.byXPath("//div[@id='menu-']//li[contains(.,'" + nosParams.getSession() + "')]")).build();
+
+			builderManager.waitAction().seconds(8).build();
 		}
 
 		if (!nosParams.getDictionary().isEmpty()) {
-			builderManager.waitForElement().seconds(10)
-					.locator(WebLocator.byXPath(String.format("//select[@id='dictionary']/option[text()='%s']",
-							nosParams.getDictionary()))).build();
-			// Choosing session from dropbox
-			builderManager.sendKeys().locator(WebLocator.byCssSelector("#dictionary")).wait(5).needClick(true)
-					.text(nosParams.getDictionary() + SendTextExtraButtons.ENTER.handCommand()).build();
+			// Opening 'dictionary' dropbox
+			builderManager.click().wait(1).locator(WebLocator.byId("dictionary")).build();
 
-			builderManager.waitAction().seconds(1).build();
+			// Choosing dictionary from dropbox
+			builderManager.click().wait(10).locator(WebLocator.byXPath("//div[@id='menu-']//li[contains(.,'" + nosParams.getDictionary() + "')]")).build();
+
+			builderManager.waitAction().seconds(5).build();
 		}
 		
 		if (!nosParams.getMessageType().isEmpty()) {
-			builderManager.waitForElement().seconds(10)
-					.locator(WebLocator.byXPath(String.format("//select[@id='msg-type']/option[text()='%s']",
-							nosParams.getMessageType()))).build();
-			// Choosing msg type from dropbox
-			builderManager.sendKeys().locator(WebLocator.byCssSelector("#msg-type")).wait(5).needClick(true)
-					.text(nosParams.getMessageType() + SendTextExtraButtons.ENTER.handCommand()).build();
+			// Opening 'message type' dropbox
+			builderManager.click().wait(1).locator(WebLocator.byId("msg-type")).build();
+			builderManager.waitAction().seconds(1).build();
 
-			// Waiting 3 sec
-			builderManager.waitAction().seconds(3).build();
+			// Choosing message type from dropbox
+			builderManager.click().wait(1).locator(WebLocator.byXPath("//div[@id='menu-']//li[contains(.,'" + nosParams.getMessageType() + "')]")).build();
+
+			builderManager.waitAction().seconds(5).build();
 		}
 		
 		uiFrameworkContext.submit("Filling service parameters");
-		
 
 		// Adding fields from script to message
-		WebLocator inputAreaLocator = WebLocator.byCssSelector(".inputarea");
-		builderManager.click().locator(inputAreaLocator).build();
-		builderManager.sendKeysToActive().text(UIUtils.keyCombo(SendTextExtraButtons.CONTROL, "a") + 
+		builderManager.click().locator(WebLocator.byCssSelector(".view-line")).build();
+		builderManager.sendKeysToActive().text(UIUtils.keyCombo(SendTextExtraButtons.CONTROL, "a") +
 				SendTextExtraButtons.DELETE).build();
 		builderManager.sendKeysToActive().text(SendTextExtraButtons.BACKSPACE.handCommand().repeat(4)).build();
 		try {
@@ -203,14 +191,14 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams>
 		}
 
 		// clicking send and extracting table
-		builderManager.click().locator(WebLocator.byXPath("//div[@class='app__buttons']/div[@role='button']")).wait(5).build();
+		builderManager.click().locator(WebLocator.byXPath("//button[contains(text(),'Send')]")).wait(5).build();
 
 		// Waiting 3 sec
 		builderManager.waitAction().seconds(3).build();
 
 		uiFrameworkContext.submit("Filling message body and sending message");
-		
-		builderManager.getElementAttribute().locator(WebLocator.byXPath("//*[@class='result ok']/pre/a"))
+
+		builderManager.getElementAttribute().locator(WebLocator.byXPath("//a[text()='Report Link'"))
 				.attribute("href").wait(20).build();
 		
 		builderManager.getScreenshot().build();
@@ -280,8 +268,7 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams>
 	}
 
 	@Override
-	public void run(NewOrderSingleParams details)
-	{
+	public void run(NewOrderSingleParams details) {
 		logger.debug("Executing SendNewOrderSingle");
 		RhSessionID sessionID = getSessionID(details);
 		this.description = getDescription(details);
@@ -338,8 +325,7 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams>
 	}
 
 	@Override
-	protected String getStatusInfo()
-	{
+	protected String getStatusInfo() {
 		return "status info";
 	}
 }
