@@ -16,22 +16,11 @@
 
 package com.exactpro.th2.act;
 
-import com.exactpro.th2.act.actions.ExtractMessage;
-import com.exactpro.th2.act.actions.FindMessageInGui;
-import com.exactpro.th2.act.actions.SendNewOrderSingle;
 import com.exactpro.th2.act.framework.TestUIFramework;
-import com.exactpro.th2.act.framework.exceptions.UIFrameworkException;
 import com.exactpro.th2.act.grpc.GetLastMessageParams;
-import com.exactpro.th2.act.grpc.UiFrameWorkHandWebActGrpc;
-import com.exactpro.th2.act.grpc.NewOrderSingleParams;
-import com.exactpro.th2.act.grpc.RhBatchResponseDemo;
-import com.exactpro.th2.act.grpc.RptViewerDetails;
-import com.exactpro.th2.act.grpc.RptViewerSearchDetails;
-import com.exactpro.th2.act.grpc.hand.RhSessionID;
-import com.exactpro.th2.act.grpc.hand.RhTargetServer;
+import com.exactpro.th2.act.grpc.RestWebActGrpc;
+import com.exactpro.th2.act.grpc.RestWebActResponseDemo;
 import com.exactpro.th2.check1.grpc.Check1Service;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.protobuf.Empty;
 import io.grpc.stub.StreamObserver;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
@@ -49,7 +38,7 @@ import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-public class HandWinAct extends UiFrameWorkHandWebActGrpc.UiFrameWorkHandWebActImplBase
+public class HandWinAct extends RestWebActGrpc.RestWebActImplBase
 {
 	private static final Logger logger = LoggerFactory.getLogger(HandWinAct.class);
 	private final TestUIFramework framework; 
@@ -67,65 +56,7 @@ public class HandWinAct extends UiFrameWorkHandWebActGrpc.UiFrameWorkHandWebActI
 	}
 
 	@Override
-	public void register(RhTargetServer request, StreamObserver<RhSessionID> responseObserver)
-	{
-		logger.debug("Executing register");
-		RhSessionID result = framework.getHandExecutor().register(request);
-		
-		try {
-			framework.registerSession(result);
-			responseObserver.onNext(result);
-		} catch (UIFrameworkException e) {
-			logger.error("Cannot register framework session", e);
-			responseObserver.onError(e);
-		}
-		
-		responseObserver.onCompleted();
-		logger.debug("Execution finished");
-	}
-	
-
-	@Override
-	public void unregister(RhSessionID request, StreamObserver<Empty> responseObserver)
-	{
-		logger.debug("Executing unregister");
-		framework.getHandExecutor().unregister(request);
-		
-		try {
-			framework.unregisterSession(request);
-			responseObserver.onNext(Empty.newBuilder().build());
-		} catch (UIFrameworkException e) {
-			logger.error("Cannot unregister framework session", e);
-			responseObserver.onError(e);
-		}
-		
-		responseObserver.onCompleted();
-		logger.debug("Execution finished");
-	}
-
-	@Override
-	public void sendNewOrderSingleGui(NewOrderSingleParams request, StreamObserver<RhBatchResponseDemo> responseObserver) {
-		logger.debug("Executing sendNewOrderSingleGui");
-		new SendNewOrderSingle(framework, verifierConnector, responseObserver).run(request);
-		logger.debug("Execution finished (sendNewOrderSingleGui)");
-	}
-
-	@Override
-	public void extractSentMessageGui(RptViewerDetails request, StreamObserver<RhBatchResponseDemo> responseObserver) {
-		logger.debug("Executing extractSentMessageGui");
-		new ExtractMessage(framework, responseObserver).run(request);
-		logger.debug("Execution finished (extractSentMessageGui)");
-	}
-
-	@Override
-	public void findMessageGui(RptViewerSearchDetails request, StreamObserver<RhBatchResponseDemo> responseObserver) {
-		logger.debug("Executing findMessageGui");
-		new FindMessageInGui(framework, responseObserver).run(request);
-		logger.debug("Execution finished (findMessageGui)");
-	}
-
-	@Override
-	public void getLastMessageFromProvider(GetLastMessageParams request, StreamObserver<RhBatchResponseDemo> responseObserver) {
+	public void getLastMessageFromProvider(GetLastMessageParams request, StreamObserver<RestWebActResponseDemo> responseObserver) {
 		logger.debug("Executing getLastMessageFromProvider");
 		final String stream = request.getStream();
 		final String messageType = request.getMsgType();
@@ -160,7 +91,7 @@ public class HandWinAct extends UiFrameWorkHandWebActGrpc.UiFrameWorkHandWebActI
 		}
 
 		var messageJson = extractMessageFromSse(messageStreamString);
-		final RhBatchResponseDemo response = RhBatchResponseDemo.newBuilder()
+		final RestWebActResponseDemo response = RestWebActResponseDemo.newBuilder()
 				.setScriptStatusValue(0)
 				.putData("message", messageJson)
 				.build();
