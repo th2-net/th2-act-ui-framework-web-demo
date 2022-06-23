@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2022 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,10 @@ public class TestUIActConfiguration extends CustomConfiguration {
 
 	@JsonProperty("act_url")
 	private String url;
+	@JsonProperty("rpt_provider_rest_api_host")
+	private String apiHost;
+	@JsonProperty("rpt_provider_rest_api_path")
+	private String apiBasePath;
 
 	public String getUrl() {
 		return url;
@@ -30,5 +34,12 @@ public class TestUIActConfiguration extends CustomConfiguration {
 
 	public void setUrl(String url) {
 		this.url = url;
+	}
+
+	public String getApiHost() {
+		return apiHost;
+	}
+	public String getApiBasePath() {
+		return apiBasePath;
 	}
 }

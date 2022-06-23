@@ -131,7 +131,7 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams> {
 	protected void collectActions(NewOrderSingleParams nosParams, TestUIFrameworkContext uiFrameworkContext,
 			ActResult actResult) throws UIFrameworkException {
 		
-		WebBuilderManager builderManager = uiFrameworkContext.createBuilderManager();
+		final WebBuilderManager builderManager = uiFrameworkContext.createBuilderManager();
 
 		CustomConfiguration configuration = this.framework.getConfiguration();
 		String url ;
@@ -169,10 +169,10 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams> {
 		if (!nosParams.getMessageType().isEmpty()) {
 			// Opening 'message type' dropbox
 			builderManager.click().wait(1).locator(WebLocator.byId("msg-type")).build();
-			builderManager.waitAction().seconds(1).build();
+			builderManager.waitAction().seconds(2).build();
 
 			// Choosing message type from dropbox
-			builderManager.click().wait(1).locator(WebLocator.byXPath("//div[@id='menu-']//li[contains(.,'" + nosParams.getMessageType() + "')]")).build();
+			builderManager.click().wait(3).locator(WebLocator.byXPath("//div[@id='menu-']//li[contains(.,'" + nosParams.getMessageType() + "')]")).build();
 
 			builderManager.waitAction().seconds(5).build();
 		}
@@ -198,7 +198,7 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams> {
 
 		uiFrameworkContext.submit("Filling message body and sending message");
 
-		builderManager.getElementAttribute().locator(WebLocator.byXPath("//a[text()='Report Link'"))
+		builderManager.getElementAttribute().locator(WebLocator.byXPath("//a[text()='Report Link']"))
 				.attribute("href").wait(20).build();
 		
 		builderManager.getScreenshot().build();
