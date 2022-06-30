@@ -48,7 +48,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +56,20 @@ import java.util.Map;
 import static com.google.protobuf.TextFormat.shortDebugString;
 
 public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams> {
-	private static final Logger logger = LoggerFactory.getLogger(SendNewOrderSingle.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(SendNewOrderSingle.class);
+	private static final String REPORT_VIEWER_FRAME = "//iframe[contains(@class, 'MuiBox-root')]";
+	private static final String OPEN_FILTER_BTN = "//div[@class='messages-list__header']//div[contains(@class, 'filter__title')]";
+
+	private static final String XPATH_FILTER = "(//div[contains(@style, 'visible')]/*[@class='filter']//*[@class='filter__compound'])";
+	private static final String TYPE_INCLUDE_TOGGLER = XPATH_FILTER + "[3]//div[@class='toggler '][1]";
+	private static final String TYPE_INPUT_FIELD = XPATH_FILTER + "[3]//input";
+	private static final String BODY_INPUT_FIELD = XPATH_FILTER + "[5]//input";
+
+	private static final String SUBMIT_FILTER_BUTTON = "//div[@class='filter-row__button' and text()='Submit filter']";
+
+	private static final String MESSAGE_CARD = "//div[contains(@class, 'message-card')]";
+	private static final String MESSAGE_MENU_BUTTON = MESSAGE_CARD + "//div[@class='message-card-tools__button']";
+	private static final String MESSAGE_COPY_FULL = MESSAGE_CARD + "//span[contains(text(),'Copy full')]";
 
 	private final Check1Service verifierConnector;
 	private Checkpoint checkpoint;
@@ -124,7 +137,7 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams> {
 
 	@Override
 	protected Logger getLogger() {
-		return logger;
+		return LOGGER;
 	}
 
 	@Override
@@ -203,18 +216,85 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams> {
 		
 		builderManager.getScreenshot().build();
 
-		RhBatchResponse sending_nos = uiFrameworkContext.submit("Checking sending result");
-		if (sending_nos.getResultList().isEmpty()) {
-			actResult.setErrorInfo("th2-hand didn't return any values (expected URL to rpt-viewer)");
+		// switch to report frame
+		builderManager.selectFrame().locator(WebLocator.byXPath(REPORT_VIEWER_FRAME)).wait(3).build();
+
+		//===== setup filter and extract sent message ==================================================================
+
+		// open filter panel
+		builderManager.click().locator(WebLocator.byXPath(OPEN_FILTER_BTN)).wait(5).build();
+		builderManager.waitAction().seconds(2).build();
+
+		// toggle 'include/exclude' type filter
+		builderManager.click().locator(WebLocator.byXPath(TYPE_INCLUDE_TOGGLER)).wait(3).build();
+
+		// put cursor to type filter input field
+		builderManager.click().locator(WebLocator.byXPath(TYPE_INPUT_FIELD)).wait(3).build();
+
+		// clear field and input message type
+		builderManager.sendKeysToActive().text("#backspace#NewOrderSingle").wait(3).build();
+
+		// put cursor to body filter input field
+		builderManager.click().locator(WebLocator.byXPath(BODY_INPUT_FIELD)).wait(3).build();
+		// put ClOrdId to the field
+		builderManager.sendKeysToActive().text(nosParams.getMessage().getClOrdID()).wait(3).build();
+
+		// press "Submit filter" button
+		builderManager.click().locator(WebLocator.byXPath(SUBMIT_FILTER_BUTTON)).wait(3).build();
+
+		copyMessageFromViewer(builderManager);
+
+		//===== setup filter and extract execution report ==============================================================
+
+		// open filter panel
+		builderManager.click().locator(WebLocator.byXPath(OPEN_FILTER_BTN)).wait(5).build();
+		builderManager.waitAction().seconds(2).build();
+
+		// put cursor to type filter input field
+		builderManager.click().locator(WebLocator.byXPath(TYPE_INPUT_FIELD)).wait(3).build();
+
+		// clear field and input message type
+		builderManager.sendKeysToActive().text("#backspace#ExecutionReport").wait(3).build();
+
+		// press "Submit filter" button
+		builderManager.click().locator(WebLocator.byXPath(SUBMIT_FILTER_BUTTON)).wait(3).build();
+
+		copyMessageFromViewer(builderManager);
+
+		//===== executing and collecting result ========================================================================
+
+		final RhBatchResponse sending_nos = uiFrameworkContext.submit("Checking sending result");
+		final List<ResultDetails> results = sending_nos.getResultList();
+		if (results.isEmpty()) {
+			actResult.setErrorInfo("th2-hand didn't return any values (expected URL to rpt-viewer, sent message and execution report).");
 			actResult.setScriptStatus(ActResult.ActExecutionStatus.EXECUTION_ERROR);
 			return;
 		}
-		ResultDetails resultDetails = sending_nos.getResultList().get(0);
+
+		final Map<String, String> res = new HashMap<>(3);
+
+		final ResultDetails resultDetails = results.get(0);
 		String urlRpt = resultDetails.getResult();
 		if (StringUtils.isNotEmpty(resultDetails.getActionId())) {
 			urlRpt = resultDetails.getActionId() + "=" + urlRpt;
 		}
-		actResult.setData(Collections.singletonMap("url", urlRpt));
+
+		res.put("url", urlRpt);
+		if (results.size() == 3) {
+			res.put("sent_message", results.get(1).getResult());
+			res.put("execution_report", results.get(2).getResult());
+		}
+
+		actResult.setData(res);
+	}
+
+	private void copyMessageFromViewer(WebBuilderManager builderManager) throws UIFrameworkBuildingException {
+		builderManager.waitAction().seconds(2).build();
+		builderManager.click().locator(WebLocator.byXPath(MESSAGE_MENU_BUTTON)).wait(3).build();
+		builderManager.waitAction().seconds(2).build();
+		builderManager.click().locator(WebLocator.byXPath(MESSAGE_COPY_FULL)).wait(3).build();
+		builderManager.waitAction().seconds(2).build();
+		builderManager.executeJS().command("return await navigator.clipboard.readText()").build();
 	}
 
 	private List<?> convertList (List<?> body) {
@@ -227,7 +307,7 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams> {
 			} else if (value instanceof List<?>) {
 				list.add(convertList((List<?>) value));
 			} else {
-				logger.error("Unknown list value {}", value.getClass().getSimpleName());
+				LOGGER.error("Unknown list value {}", value.getClass().getSimpleName());
 			}
 		}
 		return list;
@@ -247,10 +327,10 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams> {
 				} else if (value instanceof List<?>) {
 					param.put(key.getName(), convertList((List<?>) value));
 				} else {
-					logger.error("Unknown type for {} {}", key.getName(), value.getClass().getName());
+					LOGGER.error("Unknown type for {} {}", key.getName(), value.getClass().getName());
 				}
 			} else {
-				logger.error("Unknown type for {} {}", key.getName(), javaType);
+				LOGGER.error("Unknown type for {} {}", key.getName(), javaType);
 			}
 		}
 		return param;
@@ -262,14 +342,14 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams> {
 		ObjectMapper mapper = new ObjectMapper();
 		String str = mapper.writeValueAsString(json);
 		
-		logger.debug("Built json: {}", str);
+		LOGGER.debug("Built json: {}", str);
 
 		return str;
 	}
 
 	@Override
 	public void run(NewOrderSingleParams details) {
-		logger.debug("Executing SendNewOrderSingle");
+		LOGGER.debug("Executing SendNewOrderSingle");
 		RhSessionID sessionID = getSessionID(details);
 		this.description = getDescription(details);
 
@@ -283,16 +363,16 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams> {
 			}
 			frameworkContext.setParentEventId(currentEventId);
 
-			logger.debug("Creating checkpoint");
+			LOGGER.debug("Creating checkpoint");
 			checkpoint = registerCheckPoint(currentEventId);
-			logger.debug("Executing UI steps");
+			LOGGER.debug("Executing UI steps");
 			this.collectActions(details, frameworkContext, actResult);
 			this.submitActions(frameworkContext, actResult);
 			actResult.setSessionID(sessionID);
 
-			logger.debug("Execution finished");
+			LOGGER.debug("Execution finished");
 		} catch (UIFrameworkException e) {
-			logger.error("Cannot execute", e);
+			LOGGER.error("Cannot execute", e);
 			actResult.setScriptStatus(ActResult.ActExecutionStatus.ACT_ERROR);
 			actResult.setErrorInfo("Cannot unregister framework session:" + e.getMessage());
 		} finally {
@@ -304,7 +384,7 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams> {
 		try {
 			this.processResult(actResult);
 		} catch (UIFrameworkException e) {
-			logger.error("Cannot process act result", e);
+			LOGGER.error("Cannot process act result", e);
 		}
 	}
 
@@ -314,12 +394,12 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams> {
 	}
 
 	private Checkpoint registerCheckPoint(EventID parentEventId) {
-		logger.debug("Registering the checkpoint started");
+		LOGGER.debug("Registering the checkpoint started");
 		CheckpointResponse response = verifierConnector.createCheckpoint(CheckpointRequest.newBuilder()
 				.setParentEventId(parentEventId)
 				.build());
-		if (logger.isDebugEnabled()) {
-			logger.debug("Registering the checkpoint ended. Response " + shortDebugString(response));
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Registering the checkpoint ended. Response " + shortDebugString(response));
 		}
 		return response.getCheckpoint();
 	}

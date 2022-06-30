@@ -1,5 +1,5 @@
 plugins {
-    id 'com.palantir.docker' version '0.25.0' apply false
+    id 'com.palantir.docker' version '0.34.0' apply false
     id "com.jfrog.artifactory" version '4.28.2'
 }
 
@@ -45,12 +45,12 @@ artifactoryPublish.skip = true
 
 dependencies {
     api platform('com.exactpro.th2:bom:3.2.0')
-    implementation "com.exactpro.th2:common:3.39.1"
+    implementation "com.exactpro.th2:common:3.39.2"
     implementation "com.exactpro.th2:grpc-common:3.11.1"
-    implementation "com.exactpro.th2:grpc-act-uiframework-web-demo:3.2.0-TH2-3318-2549087209-SNAPSHOT"
+    implementation "com.exactpro.th2:grpc-act-uiframework-web-demo:3.3.0-TH2-3882-2591359632-SNAPSHOT"
     implementation "com.exactpro.th2:grpc-check1:3.6.0"
-    implementation "com.exactpro.th2:grpc-hand:2.10.0"
-    implementation "com.exactpro.th2:act-gui-core:2.5.0"
+    implementation "com.exactpro.th2:grpc-hand:2.11.0-TH2-3884-2590730423-SNAPSHOT"
+    implementation "com.exactpro.th2:act-gui-core:2.7.0-TH2-3884-2579413120-SNAPSHOT"
 
     implementation 'org.apache.httpcomponents:httpclient:4.5.13'
 

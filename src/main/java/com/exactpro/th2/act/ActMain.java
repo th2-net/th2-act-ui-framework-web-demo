@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2022 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,15 +55,19 @@ public class ActMain {
             MessageRouter<MessageBatch> messageRouter = factory.getMessageRouterParsedBatch();
             resources.add(messageRouter);
 
-            TestUIFramework framework = new TestUIFramework(new TestUIActConnections(factory));
-            BindableService actHandler = new HandWinAct(grpcRouter.getService(Check1Service.class), framework);
-            ActServer actServer = new TestUIActServer(grpcRouter.startServer(actHandler));
-            resources.add(actServer::stop);
+            final TestUIFramework framework = new TestUIFramework(new TestUIActConnections(factory));
+            final BindableService webActHandler = new HandWinAct(grpcRouter.getService(Check1Service.class), framework);
+
+            final var cfg = (TestUIActConfiguration) framework.getConfiguration();
+            final BindableService restActHandler = new RestAct(cfg.getApiHost(), cfg.getApiBasePath());
+
+            final ActServer webActServer = new TestUIActServer(grpcRouter.startServer(webActHandler, restActHandler));
+            resources.add(webActServer::stop);
             setReadiness(true);
             LOGGER.info("Act started");
             awaitShutdown(lock, condition);
         } catch (InterruptedException e) {
-            LOGGER.info("The main thread interupted", e);
+            LOGGER.info("The main thread interrupted", e);
         } catch (Exception e) {
             LOGGER.error("Fatal error: {}", e.getMessage(), e);
             System.exit(1);

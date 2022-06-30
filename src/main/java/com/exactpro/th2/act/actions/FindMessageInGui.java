@@ -49,7 +49,7 @@ public class FindMessageInGui extends TestUIAction<RptViewerSearchDetails> {
 	private static final String ROW_MSG_TYPE = "(//div[contains(@style, 'visible')]/*[@class='filter']//*[@class='filter__compound'])[2]//input";
 	private static final String ROW_BODY_TYPE_AND_TOGGLER = "(//div[contains(@style, 'visible')]/*[@class='filter']//*[@class='filter__compound'])[3]//div[@class='filter-row toggler-wrapper'][2]";
 	private static final String ROW_BODY_TYPE = "(//div[contains(@style, 'visible')]/*[@class='filter']//*[@class='filter__compound'])[3]//input";
-	private static final String BUTTON_APPLY_TYPE = "(//*[@class='filter-row__button'])[2]";
+	private static final String BUTTON_APPLY = "(//*[@class='filter-row__button'])[2]";
 
 
 	private static final String MESSAGE_CARD = "//div[contains(@class, 'message-card')]";
@@ -128,7 +128,7 @@ public class FindMessageInGui extends TestUIAction<RptViewerSearchDetails> {
 		builderManager.waitAction().seconds(1).build();
 		builderManager.click().locator(WebLocator.byXPath(ROW_BODY_TYPE)).build();
 		builderManager.sendKeysToActive().text(rptViewerDetails.getMsgBody() + SendTextExtraButtons.ENTER.handCommand()).build();
-		builderManager.click().locator(WebLocator.byXPath(BUTTON_APPLY_TYPE)).build();
+		builderManager.click().locator(WebLocator.byXPath(BUTTON_APPLY)).build();
 
 		// clicks on 'show message menu'
 		builderManager.executeJSElement().locator(WebLocator.byXPath(MESSAGE_SHOW_MESSAGE_MENU_XPATH)).wait(30)
