@@ -156,38 +156,30 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams> {
 		// Opening ACT-URL
 		builderManager.open().url(url).build();
 
-		// Waiting 10 sec
-		builderManager.waitAction().seconds(10).build();
-
 		if (!nosParams.getSession().isEmpty()) {
 			// Opening 'session' dropbox
-			builderManager.click().wait(1).locator(WebLocator.byId("session")).build();
+			builderManager.click().wait(10).locator(WebLocator.byId("session")).build();
 
 			// Choosing session from dropbox
-			builderManager.click().wait(10).locator(WebLocator.byXPath("//div[@id='menu-']//li[contains(.,'" + nosParams.getSession() + "')]")).build();
-
-			builderManager.waitAction().seconds(8).build();
+			builderManager.click().wait(5).locator(WebLocator.byXPath("//div[@id='menu-']//li[contains(.,'" + nosParams.getSession() + "')]")).build();
 		}
 
 		if (!nosParams.getDictionary().isEmpty()) {
 			// Opening 'dictionary' dropbox
-			builderManager.click().wait(1).locator(WebLocator.byId("dictionary")).build();
+			builderManager.click().wait(10).locator(WebLocator.byXPath("//div[@id='dictionary' and not(contains(@class, 'Mui-disabled'))]")).build();
 
 			// Choosing dictionary from dropbox
-			builderManager.click().wait(10).locator(WebLocator.byXPath("//div[@id='menu-']//li[contains(.,'" + nosParams.getDictionary() + "')]")).build();
-
-			builderManager.waitAction().seconds(5).build();
+			builderManager.click().wait(5).locator(WebLocator.byXPath("//div[@id='menu-']//li[contains(.,'" + nosParams.getDictionary() + "')]")).build();
 		}
 		
 		if (!nosParams.getMessageType().isEmpty()) {
 			// Opening 'message type' dropbox
-			builderManager.click().wait(1).locator(WebLocator.byId("msg-type")).build();
-			builderManager.waitAction().seconds(2).build();
+			builderManager.click().wait(10).locator(WebLocator.byXPath("//div[@id='msg-type' and not(contains(@class, 'Mui-disabled'))]")).build();
 
 			// Choosing message type from dropbox
-			builderManager.click().wait(3).locator(WebLocator.byXPath("//div[@id='menu-']//li[contains(.,'" + nosParams.getMessageType() + "')]")).build();
+			builderManager.click().wait(5).locator(WebLocator.byXPath("//div[@id='menu-']//li[contains(.,'" + nosParams.getMessageType() + "')]")).build();
 
-			builderManager.waitAction().seconds(5).build();
+			builderManager.waitAction().seconds(2).build();
 		}
 		
 		uiFrameworkContext.submit("Filling service parameters");
@@ -206,9 +198,6 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams> {
 		// clicking send and extracting table
 		builderManager.click().locator(WebLocator.byXPath("//button[contains(text(),'Send')]")).wait(5).build();
 
-		// Waiting 3 sec
-		builderManager.waitAction().seconds(3).build();
-
 		uiFrameworkContext.submit("Filling message body and sending message");
 
 		builderManager.getElementAttribute().locator(WebLocator.byXPath("//a[text()='Report Link']"))
@@ -223,7 +212,6 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams> {
 
 		// open filter panel
 		builderManager.click().locator(WebLocator.byXPath(OPEN_FILTER_BTN)).wait(5).build();
-		builderManager.waitAction().seconds(2).build();
 
 		// toggle 'include/exclude' type filter
 		builderManager.click().locator(WebLocator.byXPath(TYPE_INCLUDE_TOGGLER)).wait(3).build();
@@ -248,7 +236,6 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams> {
 
 		// open filter panel
 		builderManager.click().locator(WebLocator.byXPath(OPEN_FILTER_BTN)).wait(5).build();
-		builderManager.waitAction().seconds(2).build();
 
 		// put cursor to type filter input field
 		builderManager.click().locator(WebLocator.byXPath(TYPE_INPUT_FIELD)).wait(3).build();
@@ -289,11 +276,8 @@ public class SendNewOrderSingle extends TestUIAction<NewOrderSingleParams> {
 	}
 
 	private void copyMessageFromViewer(WebBuilderManager builderManager) throws UIFrameworkBuildingException {
-		builderManager.waitAction().seconds(2).build();
 		builderManager.click().locator(WebLocator.byXPath(MESSAGE_MENU_BUTTON)).wait(3).build();
-		builderManager.waitAction().seconds(2).build();
 		builderManager.click().locator(WebLocator.byXPath(MESSAGE_COPY_FULL)).wait(3).build();
-		builderManager.waitAction().seconds(2).build();
 		builderManager.executeJS().command("return await navigator.clipboard.readText()").build();
 	}
 
