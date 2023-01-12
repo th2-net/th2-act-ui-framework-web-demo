@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - version-*
     paths:
       - gradle.properties
 #    - package_info.json
