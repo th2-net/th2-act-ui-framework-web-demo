@@ -1,4 +1,4 @@
-# th2 act UI-Framework (web) demo (3.5.0)
+# th2 act UI-Framework (web) demo (3.6.0)
 
 This is a project to demonstrate Act implementation to interact with Hand in web mode.
 This project contains actions which
@@ -23,6 +23,18 @@ spec:
 ```
 
 ## Release Notes
+### 4.0.0
+
++ Provided ability to use th2-hand component add as embedded entity.
+
+#### Updated lib:
++ bom: `4.6.0`
++ common: `5.10.0-dev`
++ act-gui-core: `3.0.0-dev`
++ grpc-common `4.4.0-dev`
++ grpc-check1 `4.4.0-dev`
++ grpc-act-uiframework-web-demo: `3.3.0`
++ grpc-hand: `3.0.0-dev`
 
 ### 3.5.0
 + adopt it to new version of act-ui (1.1.40)

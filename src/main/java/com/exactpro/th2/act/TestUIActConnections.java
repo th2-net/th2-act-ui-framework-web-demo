@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2024 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,19 @@
 
 package com.exactpro.th2.act;
 
-import com.exactpro.th2.act.configuration.CustomConfiguration;
 import com.exactpro.th2.common.schema.factory.CommonFactory;
 
-public class TestUIActConnections extends ActConnections<CustomConfiguration>
-{
-	public TestUIActConnections(CommonFactory commonFactory) throws Exception
-	{
+public class TestUIActConnections extends ActConnections<TestUIActConfiguration> {
+	public TestUIActConnections(CommonFactory commonFactory) throws Exception {
 		super(commonFactory);
 	}
 
+	public TestUIActConnections(CommonFactory commonFactory, RhBatchServiceProvider provider) throws Exception {
+		super(commonFactory, provider);
+	}
+
 	@Override
-	protected TestUIActConfiguration createCustomConfiguration(CommonFactory commonFactory)
-	{
+	protected TestUIActConfiguration createCustomConfiguration(CommonFactory commonFactory) {
 		return commonFactory.getCustomConfiguration(TestUIActConfiguration.class);
 	}
 }

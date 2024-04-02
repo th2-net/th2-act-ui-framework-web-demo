@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2024 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,26 +20,31 @@ import com.exactpro.th2.act.configuration.CustomConfiguration;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TestUIActConfiguration extends CustomConfiguration {
-
 	@JsonProperty("act_url")
 	private String url;
 	@JsonProperty("rpt_provider_rest_api_host")
 	private String apiHost;
 	@JsonProperty("rpt_provider_rest_api_path")
 	private String apiBasePath;
+	@JsonProperty("embeddedHandConfig")
+	private com.exactpro.th2.hand.schema.CustomConfiguration embeddedHandConfig;
 
 	public String getUrl() {
 		return url;
 	}
 
-	public void setUrl(String url) {
-		this.url = url;
-	}
-
 	public String getApiHost() {
 		return apiHost;
 	}
+
 	public String getApiBasePath() {
 		return apiBasePath;
+	}
+
+	/**
+	 * Act use embedded hand if this config is specified
+	 */
+	public com.exactpro.th2.hand.schema.CustomConfiguration getEmbeddedHandConfig() {
+		return embeddedHandConfig;
 	}
 }

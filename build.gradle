@@ -1,16 +1,12 @@
 plugins {
-    id 'com.palantir.docker' version '0.25.0' apply false
-    id "com.jfrog.artifactory" version '4.28.2'
+    id 'application'
+    id 'java'
+    id 'java-library'
+    id 'com.palantir.docker' version '0.25.0'
 }
 
-apply plugin: 'application'
-apply plugin: 'com.palantir.docker'
-apply plugin: 'java'
-apply plugin: 'java-library'
-apply plugin: 'com.jfrog.artifactory'
-
 ext {
-    sharedDir           = file("${project.rootDir}/shared")
+    sharedDir = file("${project.rootDir}/shared")
 }
 
 group = 'com.exactpro.th2'
@@ -35,30 +31,29 @@ repositories {
     }
     mavenLocal()
 
-    configurations.all {
+    configurations.configureEach {
         resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
         resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'
     }
 }
 
-artifactoryPublish.skip = true
-
 dependencies {
-    api platform('com.exactpro.th2:bom:3.2.0')
-    implementation "com.exactpro.th2:common:3.39.1"
-    implementation "com.exactpro.th2:grpc-common:3.11.1"
-    implementation "com.exactpro.th2:grpc-act-uiframework-web-demo:3.2.0-TH2-3318-2549087209-SNAPSHOT"
-    implementation "com.exactpro.th2:grpc-check1:3.6.0"
-    implementation "com.exactpro.th2:grpc-hand:2.10.0"
-    implementation "com.exactpro.th2:act-gui-core:2.5.0"
+    api platform('com.exactpro.th2:bom:4.6.0')
 
-    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
+    implementation "com.exactpro.th2:common:5.10.0-dev"
+    implementation "com.exactpro.th2:grpc-common:4.4.0-dev"
+    implementation "com.exactpro.th2:grpc-act-uiframework-web-demo:3.3.0-RM-84612-8518589523-43e7de0-SNAPSHOT"
+    implementation "com.exactpro.th2:grpc-check1:4.4.0-dev"
+    implementation "com.exactpro.th2:grpc-hand:3.0.0-RM-84612-8517996781-SNAPSHOT"
+    implementation "com.exactpro.th2:hand:5.0.0-RM-84612-no-log4j-8518069897-76ce516-SNAPSHOT"
+    implementation "com.exactpro.th2:act-gui-core:3.0.0-RM-84612-8518102267-601b1f6-SNAPSHOT"
 
-    implementation "com.fasterxml.jackson.core:jackson-core:2.13.3"
-    implementation "com.fasterxml.jackson.core:jackson-databind:2.13.3"
+    implementation "org.apache.httpcomponents:httpclient:4.5.14"
+    implementation "org.apache.commons:commons-lang3"
+    implementation "com.fasterxml.jackson.core:jackson-core"
+    implementation "com.fasterxml.jackson.core:jackson-databind"
 
-    implementation "org.slf4j:slf4j-log4j12:1.7.36"
-    implementation "org.slf4j:slf4j-api:1.7.36"
+    implementation "org.slf4j:slf4j-log4j12:2.0.7"
 }
 
 application {
@@ -86,21 +81,6 @@ jar {
                 'Implementation-Vendor-Id': 'com.exactpro',
                 'Implementation-Version':   project.version
         )
-    }
-}
-
-artifactory {
-    publish {
-        defaults {
-            // Reference to Gradle publications defined in the build script.
-            // This is how we tell the Artifactory Plugin which artifacts should be
-            // published to Artifactory.
-            publications('mavenJava')
-            publishArtifacts = true
-            publishBuildInfo = true
-            // Properties to be attached to the published artifacts.
-            publishPom = true
-        }
     }
 }
 

@@ -1,15 +1,23 @@
-FROM gradle:6.6-jdk11 AS build
-ARG release_version
-ARG bintray_user
-ARG bintray_key
-ARG vcs_url
+FROM adoptopenjdk/openjdk11:alpine as libwebp
+ARG libwebp_version=v1.2.0
+WORKDIR /home
+RUN apk add --no-cache make git gcc musl-dev swig \
+    && git clone --branch ${libwebp_version} --single-branch https://chromium.googlesource.com/webm/libwebp  \
+    && cd libwebp \
+    && sed -i '17,20d' makefile.unix \
+    && make -f makefile.unix CPPFLAGS="-I. -Isrc/ -Wall -fPIC" \
+    && cd swig \
+    && mkdir -p java/com/exactpro/remotehand/screenwriter \
+    && swig -java -package com.exactpro.remotehand.screenwriter \
+        -outdir java/com/exactpro/remotehand/screenwriter -o libwebp_java_wrap.c libwebp.swig \
+    && gcc -shared -fPIC -fno-strict-aliasing -O2 -I/opt/java/openjdk/include/ -I/opt/java/openjdk/include/linux \
+        -I../src -L../src libwebp_java_wrap.c -lwebp -o libwebp.so
 
+FROM gradle:7.6-jdk11 AS build
+ARG release_version
+ARG vcs_url
 COPY ./ .
-RUN gradle --no-daemon clean build dockerPrepare \
-    -Prelease_version=${release_version} \
-    -Pbintray_user=${bintray_user} \
-    -Pbintray_key=${bintray_key} \
-    -Pvcs_url=${vcs_url}
+RUN gradle --debug --stacktrace --no-daemon clean build dockerPrepare -Prelease_version=${release_version} -Pvcs_url=${vcs_url}
 
 FROM adoptopenjdk/openjdk11:alpine
 ENV GRPC_PORT=8080 \
@@ -28,5 +36,6 @@ ENV GRPC_PORT=8080 \
     #FIXME: Act should resolve queue information from session info which passed by caller (script)
     TH2_FIX_CONNECTIVITY_IN_MQ=""
 WORKDIR /home
+COPY --from=libwebp /home/libwebp/swig/libwebp.so ./
 COPY --from=build /home/gradle/build/docker .
 ENTRYPOINT ["/home/service/bin/service", "/home/service/etc/config.yml"]
