@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2024 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.exactpro.th2.act;
 
 import com.exactpro.th2.act.framework.TestUIFramework;
@@ -21,6 +22,9 @@ import com.exactpro.th2.common.grpc.MessageBatch;
 import com.exactpro.th2.common.schema.factory.CommonFactory;
 import com.exactpro.th2.common.schema.grpc.router.GrpcRouter;
 import com.exactpro.th2.common.schema.message.MessageRouter;
+import com.exactpro.th2.hand.Context;
+import com.exactpro.th2.hand.services.HandBaseService;
+import com.exactpro.th2.hand.services.MessageHandler;
 import io.grpc.BindableService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +38,6 @@ import static com.exactpro.th2.common.metrics.CommonMetrics.setLiveness;
 import static com.exactpro.th2.common.metrics.CommonMetrics.setReadiness;
 
 public class ActMain {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ActMain.class);
     private static final String OE_ATTRIBUTE_NAME = "oe";
 
@@ -55,7 +58,22 @@ public class ActMain {
             MessageRouter<MessageBatch> messageRouter = factory.getMessageRouterParsedBatch();
             resources.add(messageRouter);
 
-            TestUIFramework framework = new TestUIFramework(new TestUIActConnections(factory));
+            var embeddedHandConfig = factory.getCustomConfiguration(TestUIActConfiguration.class).getEmbeddedHandConfig();
+            ActConnections<TestUIActConfiguration> connections;
+            if (embeddedHandConfig != null) {
+                LOGGER.info("Use embedded hand with config {}", embeddedHandConfig);
+                MessageHandler messageHandler = new MessageHandler(new Context(factory, embeddedHandConfig));
+                resources.add(messageHandler);
+                connections = new TestUIActConnections(factory, () -> {
+                    HandBaseService service = new HandBaseService();
+                    service.init(messageHandler);
+                    return service;
+                });
+            } else {
+                connections = new TestUIActConnections(factory);
+            }
+
+            TestUIFramework framework = new TestUIFramework(connections);
             BindableService actHandler = new HandWinAct(grpcRouter.getService(Check1Service.class), framework);
             ActServer actServer = new TestUIActServer(grpcRouter.startServer(actHandler));
             resources.add(actServer::stop);
